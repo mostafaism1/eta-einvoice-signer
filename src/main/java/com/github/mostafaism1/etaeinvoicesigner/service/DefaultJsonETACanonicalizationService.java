@@ -51,8 +51,8 @@ public class DefaultJsonETACanonicalizationService implements JsonETACanonicaliz
     }
 
     // Base case.
-    private String canonicalizePropertyName(String str) {
-        return "\"" + str.toUpperCase() + "\"";
+    private String canonicalizeJsonPropertyName(String propertyName) {
+        return "\"" + propertyName.toUpperCase() + "\"";
     }
 
     // Base case.
@@ -66,23 +66,23 @@ public class DefaultJsonETACanonicalizationService implements JsonETACanonicaliz
     }
 
     // Recursive step.
-    private String canonicalizeJsonObject(JsonObject jsonObject) {
+    private String canonicalizeJsonArray(JsonArray jsonArray, String key) {
         StringBuilder sb = new StringBuilder();
-        for (String key : jsonObject.keySet()) {
-            JsonElement jsonElement = jsonObject.get(key);
-            String canonicalizedElement = dispatchToCanonicalize(jsonElement, key);
-            sb.append(canonicalizePropertyName(key));
-            sb.append(canonicalizedElement);
+        for (JsonElement jsonElement : jsonArray) {
+            sb.append(canonicalizeJsonPropertyName(key));
+            sb.append(dispatchToCanonicalize(jsonElement));
         }
         return sb.toString();
     }
 
     // Recursive step.
-    private String canonicalizeJsonArray(JsonArray jsonArray, String key) {
+    private String canonicalizeJsonObject(JsonObject jsonObject) {
         StringBuilder sb = new StringBuilder();
-        for (JsonElement jsonElement : jsonArray) {
-            sb.append(canonicalizePropertyName(key));
-            sb.append(dispatchToCanonicalize(jsonElement));
+        for (String key : jsonObject.keySet()) {
+            JsonElement jsonElement = jsonObject.get(key);
+            String canonicalizedElement = dispatchToCanonicalize(jsonElement, key);
+            sb.append(canonicalizeJsonPropertyName(key));
+            sb.append(canonicalizedElement);
         }
         return sb.toString();
     }
