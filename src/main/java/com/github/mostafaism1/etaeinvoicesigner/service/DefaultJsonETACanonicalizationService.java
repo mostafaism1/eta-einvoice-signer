@@ -46,7 +46,7 @@ public class DefaultJsonETACanonicalizationService implements JsonETACanonicaliz
         } else if (jsonElement.isJsonObject()) {
             return canonicalizeJsonObject((JsonObject) jsonElement);
         } else {
-            throw new IllegalArgumentException(jsonElement + " is not a valid JsonElement");
+            throw new JsonSyntaxException(jsonElement + " is not a valid JsonElement");
         }
     }
 
