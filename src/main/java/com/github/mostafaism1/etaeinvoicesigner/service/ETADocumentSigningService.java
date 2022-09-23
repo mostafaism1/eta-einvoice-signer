@@ -83,7 +83,7 @@ public class ETADocumentSigningService implements DocumentSigningService {
         JsonObject signatureObject = new JsonObject();
         signatureObject.add("signatureType", new JsonPrimitive("I"));
         signatureObject.add("value",
-                new JsonPrimitive(Base64.getEncoder().encode(signature).toString()));
+                new JsonPrimitive(Base64.getEncoder().encodeToString(signature)));
         signatures.add(signatureObject);
         Gson gson = new Gson();
         JsonObject signedDocument = gson.fromJson(document, JsonObject.class);
