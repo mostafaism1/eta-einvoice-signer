@@ -4,18 +4,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 
-public class DefaultJsonETACanonicalizationServiceTest {
+public class ETADocumentSigningServiceTest {
 
-        private JsonETACanonicalizationService jsonETACanonicalizationService =
-                        new DefaultJsonETACanonicalizationService();
+        private DocumentSigningService documentSigningService = new ETADocumentSigningService();
 
         @Test
-        public void it_should_pass_ETA_official_example() throws JSONException {
+        public void canonicalize_should_pass_ETA_official_example() throws JSONException {
                 // Given.
                 String input = getETAExampleUncanonical();
                 String expected = getETAExampleCanonical();
                 // When.
-                String actual = jsonETACanonicalizationService.canonicalize(input);
+                String actual = documentSigningService.canonicalize(input);
                 // Then.
                 assertEquals(expected, actual);
         }
