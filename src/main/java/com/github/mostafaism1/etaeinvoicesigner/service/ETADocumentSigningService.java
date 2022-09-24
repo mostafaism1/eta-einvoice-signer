@@ -24,10 +24,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.TypeAdapter;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
 @NoArgsConstructor
 @Service
 public class ETADocumentSigningService implements DocumentSigningService {
@@ -66,10 +64,11 @@ public class ETADocumentSigningService implements DocumentSigningService {
      */
     @Override
     public byte[] sign(String data) {
+        byte[] dataInBytes = data.getBytes(StandardCharsets.UTF_8);
         loadPKCS11Implementation();
         try {
             PrivateKey privateKey = getPrivateKey();
-            return signWithPrivateKey(data.getBytes((StandardCharsets.UTF_8)), privateKey);
+            return signWithPrivateKey(dataInBytes, privateKey);
         } catch (UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException
                 | CertificateException | IOException | InvalidKeyException | SignatureException e) {
             e.printStackTrace();
