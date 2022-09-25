@@ -3,10 +3,14 @@ package com.github.mostafaism1.etaeinvoicesigner.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
+@SpringBootTest
 public class ETADocumentSigningServiceTest {
 
-        private DocumentSigningService documentSigningService = new ETADocumentSigningService();
+        @Autowired
+        private DocumentSigningService documentSigningService;
 
         @Test
         public void canonicalize_should_pass_ETA_official_example() throws JSONException {
