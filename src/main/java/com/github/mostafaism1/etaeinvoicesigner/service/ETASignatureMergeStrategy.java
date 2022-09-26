@@ -8,7 +8,7 @@ import com.google.gson.JsonPrimitive;
 public class ETASignatureMergeStrategy implements SignatureMergeStrategy {
 
     @Override
-    public String generateSignedDocument(String document, String signature) {
+    public String merge(String document, String signature) {
         JsonArray signatures = new JsonArray();
         JsonObject signatureObject = new JsonObject();
         signatureObject.add("signatureType", new JsonPrimitive("I"));

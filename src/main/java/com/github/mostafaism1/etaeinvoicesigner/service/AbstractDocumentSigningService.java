@@ -19,9 +19,8 @@ public abstract class AbstractDocumentSigningService implements DocumentSigningS
     }
 
     @Override
-    public String generateSignedDocument(String document, String signature) {
-        return documentSigningFactory.getSignatureMergeStrategy().generateSignedDocument(document,
-                signature);
+    public String merge(String document, String signature) {
+        return documentSigningFactory.getSignatureMergeStrategy().merge(document, signature);
     }
 
 }

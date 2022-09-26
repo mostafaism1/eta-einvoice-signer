@@ -18,6 +18,6 @@ public class SignatureController {
     public String sign(@RequestBody String jsonDocument) {
         String canonicalizedDocument = documentSigningService.canonicalize(jsonDocument);
         String signature = documentSigningService.sign(canonicalizedDocument);
-        return documentSigningService.generateSignedDocument(jsonDocument, signature);
+        return documentSigningService.merge(jsonDocument, signature);
     }
 }
