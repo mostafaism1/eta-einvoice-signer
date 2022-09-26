@@ -3,11 +3,11 @@ package com.github.mostafaism1.etaeinvoicesigner.service;
 public interface DocumentSigningService {
 
     /**
-     * Transforms a valid document to a canonical format.
+     * Transforms a document to its canonical format.
      * 
      * @param document a valid document
-     * @return the canonical document
-     * @throws InvalidDocumentFormatException if document is an invalid json
+     * @return the document in the canonical format
+     * @throws InvalidDocumentFormatException if the document's format is invalid
      */
     String canonicalize(String document) throws InvalidDocumentFormatException;
 
@@ -15,15 +15,15 @@ public interface DocumentSigningService {
      * Generates a cryptographic signature of the data.
      * 
      * @param data data to be signed
-     * @return the signed data
+     * @return the signature
      */
     byte[] sign(String data);
 
     /**
-     * Generates a signed document.
+     * Merges a document and its signature into a single signed document.
      * 
      * @param document the original document
-     * @param signature a signature of the document
+     * @param signature the document's signature
      * @return a signed document
      */
     String generateSignedDocument(String document, byte[] signature);
