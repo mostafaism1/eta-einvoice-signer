@@ -14,14 +14,14 @@ public abstract class AbstractDocumentSigningService implements DocumentSigningS
     }
 
     @Override
-    public byte[] sign(String data) {
+    public String sign(String data) {
         return documentSigningFactory.getSigningStrategy().sign(data);
     }
 
     @Override
-    public String generateSignedDocument(String document, byte[] signature) {
-        return documentSigningFactory.getSignatureMergeStrategy()
-                .generateSignedDocument(document, signature);
+    public String generateSignedDocument(String document, String signature) {
+        return documentSigningFactory.getSignatureMergeStrategy().generateSignedDocument(document,
+                signature);
     }
 
 }

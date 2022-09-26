@@ -15,6 +15,7 @@ import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 import java.util.Collections;
 import org.bouncycastle.asn1.ess.ESSCertIDv2;
 import org.bouncycastle.asn1.ess.SigningCertificateV2;
@@ -57,7 +58,7 @@ public class ETASigningStrategy implements SigningStrategy {
          * document</a> for the specifications of a CADES-BES signature.
          */
         @Override
-        public byte[] sign(String data) {
+        public String sign(String data) {
                 byte[] dataInBytes = data.getBytes(StandardCharsets.UTF_8);
                 loadPKCS11Implementation();
                 try {
@@ -112,7 +113,7 @@ public class ETASigningStrategy implements SigningStrategy {
                         CMSTypedData cmsTypedData = new CMSProcessableByteArray(dataInBytes);
                         CMSSignedData cmsSignedData = generator.generate(cmsTypedData);
 
-                        return cmsSignedData.getEncoded();
+                        return Base64.getEncoder().encodeToString(cmsSignedData.getEncoded());
                 } catch (UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException
                                 | CertificateException | IOException | CMSException
                                 | OperatorCreationException e) {

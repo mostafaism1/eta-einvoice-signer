@@ -9,6 +9,6 @@ public interface SignatureMergeStrategy {
      * @param signature the document's signature
      * @return a signed document
      */
-    String generateSignedDocument(String document, byte[] signature);
+    String generateSignedDocument(String document, String signature);
 
 }

@@ -8,6 +8,6 @@ public interface SigningStrategy {
      * @param data data to be signed
      * @return the signature
      */
-    byte[] sign(String data);
+    String sign(String data);
 
 }

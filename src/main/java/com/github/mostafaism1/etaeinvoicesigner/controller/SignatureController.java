@@ -17,7 +17,7 @@ public class SignatureController {
     @ResponseBody
     public String sign(@RequestBody String jsonDocument) {
         String canonicalizedDocument = documentSigningService.canonicalize(jsonDocument);
-        byte[] signature = documentSigningService.sign(canonicalizedDocument);
+        String signature = documentSigningService.sign(canonicalizedDocument);
         return documentSigningService.generateSignedDocument(jsonDocument, signature);
     }
 }
