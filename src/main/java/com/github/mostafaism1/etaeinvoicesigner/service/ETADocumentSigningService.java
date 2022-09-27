@@ -13,7 +13,7 @@ public class ETADocumentSigningService extends AbstractDocumentSigningService {
     public String generateSignedDocument(String document) {
         String canonicalizedDocument = super.canonicalize(document);
         String signature = super.sign(canonicalizedDocument);
-        return super.merge(canonicalizedDocument, signature);
+        return super.merge(document, signature);
     }
 
 }
