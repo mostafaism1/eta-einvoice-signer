@@ -40,7 +40,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.springframework.beans.factory.annotation.Value;
 
-public class ETASigningStrategy implements SigningStrategy {
+public class ETASigningStrategyA implements SigningStrategy {
 
         @Value("${pkcs11ConfigFilePath}")
         private String pkcs11ConfigFilePath;
