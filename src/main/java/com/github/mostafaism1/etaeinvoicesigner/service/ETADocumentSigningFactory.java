@@ -9,7 +9,7 @@ public class ETADocumentSigningFactory implements DocumentSigningFactory {
 
     @Override
     public SigningStrategy getSigningStrategy() {
-        return new ETASigningStrategyA();
+        return new ETASigningStrategyB();
     }
 
     @Override
