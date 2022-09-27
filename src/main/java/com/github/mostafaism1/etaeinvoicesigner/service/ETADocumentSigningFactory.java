@@ -1,5 +1,8 @@
 package com.github.mostafaism1.etaeinvoicesigner.service;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class ETADocumentSigningFactory implements DocumentSigningFactory {
 
     @Override
