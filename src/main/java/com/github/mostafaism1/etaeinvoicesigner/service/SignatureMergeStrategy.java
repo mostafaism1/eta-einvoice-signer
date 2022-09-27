@@ -7,7 +7,7 @@ public interface SignatureMergeStrategy {
      * 
      * @param document the original document
      * @param signature the document's signature
-     * @return a signed document
+     * @return the signed document
      */
     String merge(String document, String signature);
 
