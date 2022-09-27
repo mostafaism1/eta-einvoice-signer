@@ -3,16 +3,11 @@ package com.github.mostafaism1.etaeinvoicesigner.service;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
@@ -38,17 +33,10 @@ import org.bouncycastle.operator.DigestCalculatorProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
-import org.springframework.beans.factory.annotation.Value;
 
 public class ETASigningStrategyA implements SigningStrategy {
 
-        @Value("${pkcs11ConfigFilePath}")
-        private String pkcs11ConfigFilePath;
-        @Value("${keyStorePassword}")
-        private String keyStorePassword;
-        @Value("${certificateAlias}")
-        private String certificateAlias;
-
+        private SecurityFactory securityFactory;
 
         /**
          * Creates a CADES-BES signature.
@@ -60,10 +48,10 @@ public class ETASigningStrategyA implements SigningStrategy {
         @Override
         public String sign(String data) {
                 byte[] dataInBytes = data.getBytes(StandardCharsets.UTF_8);
-                loadPKCS11Implementation();
+                securityFactory.addSecurityProvider();
                 try {
-                        PrivateKey privateKey = getPrivateKey();
-                        X509Certificate x509Certificate = getCertificate();
+                        PrivateKey privateKey = securityFactory.getPrivateKey();
+                        X509Certificate x509Certificate = securityFactory.getCertificate();
 
                         // Prepare signing certificate
                         MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
@@ -114,39 +102,14 @@ public class ETASigningStrategyA implements SigningStrategy {
                         CMSSignedData cmsSignedData = generator.generate(cmsTypedData);
 
                         return Base64.getEncoder().encodeToString(cmsSignedData.getEncoded());
-                } catch (UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException
-                                | CertificateException | IOException | CMSException
-                                | OperatorCreationException e) {
+                } catch (NoSuchAlgorithmException | CertificateException | IOException
+                                | CMSException | OperatorCreationException e) {
                         e.printStackTrace();
                 }
                 return null;
         }
 
-        private X509Certificate getCertificate() throws KeyStoreException, IOException,
-                        NoSuchAlgorithmException, CertificateException {
-                String keyStoreType = "PKCS11";
-                KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-                keyStore.load(null, keyStorePassword.toCharArray());
-                X509Certificate x509Certificate =
-                                (X509Certificate) keyStore.getCertificate(certificateAlias);
-                return x509Certificate;
-        }
 
-        private void loadPKCS11Implementation() {
-                String providerName = "SunPKCS11";
-                Provider provider = Security.getProvider(providerName);
-                provider = provider.configure(pkcs11ConfigFilePath);
-                Security.addProvider(provider);
-        }
-
-        private PrivateKey getPrivateKey() throws KeyStoreException, IOException,
-                        NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
-                String keyStoreType = "PKCS11";
-                KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-                keyStore.load(null, keyStorePassword.toCharArray());
-                PrivateKey privateKey = (PrivateKey) keyStore.getKey(certificateAlias, null);
-                return privateKey;
-        }
 
         private byte[] signWithPrivateKey(byte[] data, PrivateKey privateKey)
                         throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
