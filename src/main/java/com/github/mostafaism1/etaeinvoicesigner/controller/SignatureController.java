@@ -16,8 +16,6 @@ public class SignatureController {
     @PostMapping("")
     @ResponseBody
     public String sign(@RequestBody String jsonDocument) {
-        String canonicalizedDocument = documentSigningService.canonicalize(jsonDocument);
-        String signature = documentSigningService.sign(canonicalizedDocument);
-        return documentSigningService.merge(jsonDocument, signature);
+        return documentSigningService.generateSignedDocument(jsonDocument);
     }
 }
