@@ -55,10 +55,21 @@
 			<version>2.3.1</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15on -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-jdk15on</artifactId>
 			<version>1.70</version>
+		</dependency> -->
+				<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.49</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk15on</artifactId>
+			<version>1.49</version>
 		</dependency>
 
 	</dependencies>
