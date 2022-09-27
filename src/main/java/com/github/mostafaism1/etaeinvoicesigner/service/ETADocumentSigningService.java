@@ -9,4 +9,11 @@ public class ETADocumentSigningService extends AbstractDocumentSigningService {
         super(new ETADocumentSigningFactory());
     }
 
+    @Override
+    public String generateSignedDocument(String document) {
+        String canonicalizedDocument = super.canonicalize(document);
+        String signature = super.sign(canonicalizedDocument);
+        return super.merge(canonicalizedDocument, signature);
+    }
+
 }
