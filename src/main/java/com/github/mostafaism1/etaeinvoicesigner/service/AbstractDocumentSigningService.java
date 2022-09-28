@@ -4,8 +4,8 @@ public abstract class AbstractDocumentSigningService implements DocumentSigningS
 
     private DocumentSigningFactory documentSigningFactory;
 
-    protected AbstractDocumentSigningService(DocumentSigningFactory documentSigningFactory) {
-        this.documentSigningFactory = documentSigningFactory;
+    protected AbstractDocumentSigningService() {
+        this.documentSigningFactory = getDocumentSigningFactory();
     }
 
     @Override
@@ -22,5 +22,7 @@ public abstract class AbstractDocumentSigningService implements DocumentSigningS
     public String merge(String document, String signature) {
         return documentSigningFactory.getSignatureMergeStrategy().merge(document, signature);
     }
+
+    protected abstract DocumentSigningFactory getDocumentSigningFactory();
 
 }
