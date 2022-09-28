@@ -22,7 +22,7 @@ public class ETADocumentSigningFactory implements DocumentSigningFactory {
 
     @Override
     public SecurityFactory getSecurityFactory() {
-        return new PKCS11SecurityFactory();
+        return new SunPKCS11SecurityFactory();
     }
 
 }

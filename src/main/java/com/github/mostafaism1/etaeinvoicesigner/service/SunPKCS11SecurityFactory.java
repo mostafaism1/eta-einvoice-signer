@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PKCS11SecurityFactory implements SecurityFactory {
+public class SunPKCS11SecurityFactory implements SecurityFactory {
 
     private static final String PROVIDER_NAME = "SunPKCS11";
     private static final String KEY_STORE_TYPE = "PKCS11";
@@ -23,7 +23,7 @@ public class PKCS11SecurityFactory implements SecurityFactory {
 
     private Provider provider;
 
-    public PKCS11SecurityFactory() {
+    public SunPKCS11SecurityFactory() {
         provider = Security.getProvider(PROVIDER_NAME);
     }
 

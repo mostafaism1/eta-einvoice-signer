@@ -12,14 +12,14 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PKCS12SecurityFactory implements SecurityFactory {
+public class BouncyCastleSecurityFactory implements SecurityFactory {
 
     private static final String BASE_CERT_PATH =
             "/Users/mostafaismail/workspace/eta-einvoice-signer/certs/";
 
     private Provider provider;
 
-    public PKCS12SecurityFactory() {
+    public BouncyCastleSecurityFactory() {
         provider = new BouncyCastleProvider();
     }
 
