@@ -38,6 +38,10 @@ public class ETASigningStrategyA implements SigningStrategy {
 
         private SecurityFactory securityFactory;
 
+        public ETASigningStrategyA(SecurityFactory securityFactory) {
+                this.securityFactory = securityFactory;
+        }
+
         /**
          * Creates a CADES-BES signature.
          * 
