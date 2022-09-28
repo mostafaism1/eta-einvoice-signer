@@ -12,12 +12,17 @@ public class ETADocumentSigningFactory implements DocumentSigningFactory {
 
     @Override
     public SigningStrategy getSigningStrategy() {
-        return new ETASigningStrategyB();
+        return new ETASigningStrategyB(getSecurityFactory());
     }
 
     @Override
     public SignatureMergeStrategy getSignatureMergeStrategy() {
         return new ETASignatureMergeStrategy();
+    }
+
+    @Override
+    public SecurityFactory getSecurityFactory() {
+        return new PKCS11SecurityFactory();
     }
 
 }

@@ -8,4 +8,6 @@ public interface DocumentSigningFactory {
 
     SignatureMergeStrategy getSignatureMergeStrategy();
 
+    SecurityFactory getSecurityFactory();
+
 }
