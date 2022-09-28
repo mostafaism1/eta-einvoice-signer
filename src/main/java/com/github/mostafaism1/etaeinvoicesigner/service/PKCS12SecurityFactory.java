@@ -5,21 +5,34 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.springframework.stereotype.Service;
 
+@Service
 public class PKCS12SecurityFactory implements SecurityFactory {
+
+    private static final String BASE_CERT_PATH =
+            "/Users/mostafaismail/workspace/eta-einvoice-signer/certs/";
+
+    private Provider provider;
+
+    public PKCS12SecurityFactory() {
+        provider = new BouncyCastleProvider();
+    }
 
     @Override
     public void addSecurityProvider() {
-        Security.addProvider(new BouncyCastleProvider());
+        Security.addProvider(provider);
     }
 
     @Override
     public PrivateKey getPrivateKey() {
         try {
-            InputStream inputStream = Files.newInputStream(Path.of("signer-key-store.p12"));
+            InputStream inputStream =
+                    Files.newInputStream(Path.of(BASE_CERT_PATH, "signer-key-store.p12"));
             KeyStore keyStore = KeyStore.getInstance("PKCS12");
             keyStore.load(inputStream, "password".toCharArray());
             PrivateKey privateKey =
@@ -34,7 +47,8 @@ public class PKCS12SecurityFactory implements SecurityFactory {
     @Override
     public X509Certificate getCertificate() {
         try {
-            InputStream inputStream = Files.newInputStream(Path.of("signer-key-store.p12"));
+            InputStream inputStream =
+                    Files.newInputStream(Path.of(BASE_CERT_PATH, "signer-key-store.p12"));
             KeyStore keyStore = KeyStore.getInstance("PKCS12");
             keyStore.load(inputStream, "password".toCharArray());
             X509Certificate x509Certificate =
@@ -44,6 +58,11 @@ public class PKCS12SecurityFactory implements SecurityFactory {
             System.out.println(e);
             return null;
         }
+    }
+
+    @Override
+    public Provider getProvider() {
+        return provider;
     }
 
 }

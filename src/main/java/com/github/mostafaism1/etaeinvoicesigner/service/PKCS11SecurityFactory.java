@@ -6,7 +6,9 @@ import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
+@Service
 public class PKCS11SecurityFactory implements SecurityFactory {
 
     private static final String PROVIDER_NAME = "SunPKCS11";
@@ -19,9 +21,14 @@ public class PKCS11SecurityFactory implements SecurityFactory {
     @Value("${certificateAlias}")
     private String certificateAlias;
 
+    private Provider provider;
+
+    public PKCS11SecurityFactory() {
+        provider = Security.getProvider(PROVIDER_NAME);
+    }
+
     @Override
     public void addSecurityProvider() {
-        Provider provider = Security.getProvider(PROVIDER_NAME);
         provider = provider.configure(pkcs11ConfigFilePath);
         Security.addProvider(provider);
     }
@@ -51,6 +58,11 @@ public class PKCS11SecurityFactory implements SecurityFactory {
             System.out.println(e);
             return null;
         }
+    }
+
+    @Override
+    public Provider getProvider() {
+        return provider;
     }
 
 }
