@@ -2,12 +2,14 @@ package com.github.mostafaism1.etaeinvoicesigner.service;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.fail;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
 import java.security.spec.InvalidKeySpecException;
 import java.text.ParseException;
@@ -23,6 +25,8 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1UTCTime;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.ess.ESSCertIDv2;
+import org.bouncycastle.asn1.ess.SigningCertificateV2;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -65,16 +69,11 @@ public class CadesBesSigningStrategyTest {
     }
 
     @Test
-    public void signature_should_be_a_CMS_signature() throws IOException, CMSException {
+    public void signature_should_be_a_CMS_SignedData_signature() throws IOException, CMSException {
         // Given.
 
         // When, then.
         assertDoesNotThrow(() -> new CMSSignedData(signedInput));
-    }
-
-    @Test
-    public void signature_CMS_contentType_should_be_signedData() throws IOException, CMSException {
-        fail("Not yet implemented");
     }
 
     @Test
@@ -110,7 +109,7 @@ public class CadesBesSigningStrategyTest {
         String contentType = signedData.getSignedContentTypeOID();
 
         // Then.
-        then(contentType).isEqualTo(PKCSObjectIdentifiers.digestedData);
+        then(contentType).isEqualTo(PKCSObjectIdentifiers.digestedData.toString());
     }
 
 
@@ -212,7 +211,7 @@ public class CadesBesSigningStrategyTest {
     }
 
     @Test
-    public void signerInfo_signedAttrs_should_contain_4_attributes() throws CMSException {
+    public void signerInfo_signedAttrs_should_contain_at_least_4_attributes() throws CMSException {
         // Given.
         CMSSignedData signedData = new CMSSignedData(signedInput);
 
@@ -220,7 +219,7 @@ public class CadesBesSigningStrategyTest {
         SignerInformation signerInfo = signedData.getSignerInfos().getSigners().iterator().next();
 
         // Then.
-        then(signerInfo.getSignedAttributes().size()).isEqualTo(4);
+        then(signerInfo.getSignedAttributes().size()).isGreaterThanOrEqualTo(4);
     }
 
     @Test
@@ -311,20 +310,25 @@ public class CadesBesSigningStrategyTest {
 
     @Test
     public void signerInfo_signedAttrs_ESSSigningCertificateV2_should_contains_SHA256_hash_of_the_signer_certificate()
-            throws CMSException, NoSuchAlgorithmException, CertificateEncodingException {
+            throws CMSException, NoSuchAlgorithmException, CertificateEncodingException,
+            IOException {
 
         // Given.
         CMSSignedData signedData = new CMSSignedData(signedInput);
         MessageDigest sha256d = MessageDigest.getInstance("SHA-256");
 
         // When.
-        var messageDigest = signedData.getSignerInfos().getSigners().iterator().next()
+        var certificateDigest = signedData.getSignerInfos().getSigners().iterator().next()
                 .getSignedAttributes().get(new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.2.47"))
                 .getAttrValues().getObjectAt(0);
 
+        ESSCertIDv2[] certsIDv2 = SigningCertificateV2.getInstance(certificateDigest).getCerts();
+        ESSCertIDv2 certIDv2 = certsIDv2[0];
+        byte[] certIDv2Hash = certIDv2.getCertHash();
+
         // Then.
-        then(messageDigest)
-                .isEqualTo(sha256d.digest(securityFactory.getCertificate().getEncoded()));
+        byte[] expected = sha256d.digest(securityFactory.getCertificate().getEncoded());
+        then(certIDv2Hash).isEqualTo(expected);
     }
 
     @Test
@@ -373,33 +377,28 @@ public class CadesBesSigningStrategyTest {
     public void signerInfo_Signature_should_be_Signature_value_computed_on_the_user_data_and_on_the_signed_attributes_using_the_signer_private_key_with_Algorithm_sha256WithRSAEncryption()
             throws CMSException, NoSuchAlgorithmException, IOException, NoSuchPaddingException,
             InvalidKeyException, IllegalBlockSizeException, BadPaddingException,
-            InvalidKeySpecException {
+            InvalidKeySpecException, CertificateException, OperatorCreationException,
+            SignatureException {
 
-        fail("Not yet implemented.");
 
-        // // Given.
-        // CMSSignedData signedData = new CMSSignedData(signedInput);
+        // Given.
+        CMSSignedData signedData = new CMSSignedData(signedInput);
 
-        // byte[] signature =
-        // signedData.getSignerInfos().getSigners().iterator().next().getSignature();
+        byte[] signature =
+                signedData.getSignerInfos().getSigners().iterator().next().getSignature();
 
-        // // When.
-        // byte[] encodedSignedAttributes =
-        // signedData.getSignerInfos().getSigners().iterator().next()
-        // .getEncodedSignedAttributes();
+        // When.
+        byte[] encodedSignedAttributes = signedData.getSignerInfos().getSigners().iterator().next()
+                .getEncodedSignedAttributes();
 
-        // MessageDigest sha256d = MessageDigest.getInstance("SHA-256", new BouncyCastleProvider());
-        // Cipher cipher = Cipher.getInstance("RSA", new BouncyCastleProvider());
-        // cipher.init(Cipher.ENCRYPT_MODE, securityFactory.getPrivateKey());
-        // byte[] digest = sha256d.digest(encodedSignedAttributes);
-        // byte[] signedDigest = cipher.doFinal(digest);
+        Signature verifier =
+                Signature.getInstance("SHA256withRSAEncryption", securityFactory.getProvider());
+        verifier.initVerify(securityFactory.getCertificate().getPublicKey());
+        verifier.update(encodedSignedAttributes);
+        boolean actual = verifier.verify(signature);
 
-        // boolean equals = Arrays.equals(new DEROctetString(digest).getEncoded(),
-        // signedData.getSignerInfos().getSigners().iterator().next().getSignedAttributes()
-        // .get(new ASN1ObjectIdentifier("1.2.840.113549.1.9.4")).getAttrValues()
-        // .getEncoded());
-        // // Then.
-        // then(signature).isEqualTo(new DEROctetString(signedDigest).getEncoded());
+        // Then.
+        then(actual).isTrue();
     }
 
 
