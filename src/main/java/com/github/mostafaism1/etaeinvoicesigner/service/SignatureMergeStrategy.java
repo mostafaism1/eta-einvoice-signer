@@ -1,5 +1,6 @@
 package com.github.mostafaism1.etaeinvoicesigner.service;
 
+@FunctionalInterface
 public interface SignatureMergeStrategy {
 
     /**
