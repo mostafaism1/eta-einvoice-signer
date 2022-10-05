@@ -14,8 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class BouncyCastleSecurityFactory implements SecurityFactory {
 
-    private static final String BASE_CERT_PATH =
-            "/Users/mostafaismail/workspace/eta-einvoice-signer/certs/";
+    private static final String BASE_CERT_PATH = "src/main/resources/certs/";
 
     private Provider provider;
 
