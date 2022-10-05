@@ -9,15 +9,19 @@ public class ETASignatureMergeStrategy implements SignatureMergeStrategy {
 
     @Override
     public String merge(String document, String signature) {
+        JsonObject result = new Gson().fromJson(document, JsonObject.class);
         JsonArray signatures = new JsonArray();
-        JsonObject signatureObject = new JsonObject();
-        signatureObject.add("signatureType", new JsonPrimitive("I"));
-        signatureObject.add("value", new JsonPrimitive(signature));
-        signatures.add(signatureObject);
-        Gson gson = new Gson();
-        JsonObject signedDocument = gson.fromJson(document, JsonObject.class);
-        signedDocument.add("signatures", signatures);
-        return signedDocument.toString();
+        signatures.add(buildIssuerTypeSignature(signature));
+        result.add("signatures", signatures);
+        return result.toString();
+    }
+
+    private JsonObject buildIssuerTypeSignature(String signature) {
+        JsonObject result = new JsonObject();
+        final String ISSUER_TYPE = "I";
+        result.add("signatureType", new JsonPrimitive(ISSUER_TYPE));
+        result.add("value", new JsonPrimitive(signature));
+        return result;
     }
 
 }
