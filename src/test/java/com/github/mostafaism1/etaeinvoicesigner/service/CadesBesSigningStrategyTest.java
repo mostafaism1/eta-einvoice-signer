@@ -50,7 +50,8 @@ import org.junit.jupiter.api.Test;
  * Testing strategy
  *
  * All the tests in this class are about validating the structure of a generated signature by
- * inspecting the signature's components and comparing them against an expected value.
+ * inspecting the signature's components using observer methods and comparing them against an
+ * expected value.
  */
 public class CadesBesSigningStrategyTest {
     private SecurityFactory securityFactory;
