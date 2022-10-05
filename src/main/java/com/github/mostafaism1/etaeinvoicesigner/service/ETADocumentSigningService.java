@@ -3,7 +3,7 @@ package com.github.mostafaism1.etaeinvoicesigner.service;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ETADocumentSigningService extends AbstractDocumentSigningService {
+public class ETADocumentSigningService extends BaseDocumentSigningService {
 
     @Override
     public String generateSignedDocument(String document) {

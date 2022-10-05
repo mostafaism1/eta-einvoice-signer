@@ -1,10 +1,10 @@
 package com.github.mostafaism1.etaeinvoicesigner.service;
 
-public abstract class AbstractDocumentSigningService implements DocumentSigningService {
+public abstract class BaseDocumentSigningService implements DocumentSigningService {
 
     private DocumentSigningFactory documentSigningFactory;
 
-    protected AbstractDocumentSigningService() {
+    protected BaseDocumentSigningService() {
         this.documentSigningFactory = getDocumentSigningFactory();
     }
 
