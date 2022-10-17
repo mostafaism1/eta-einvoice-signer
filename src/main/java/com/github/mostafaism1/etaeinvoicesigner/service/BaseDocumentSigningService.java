@@ -9,6 +9,13 @@ public abstract class BaseDocumentSigningService implements DocumentSigningServi
     }
 
     @Override
+    public String generateSignedDocument(String document) {
+        String canonicalizedDocument = canonicalize(document);
+        String signature = sign(canonicalizedDocument);
+        return merge(document, signature);
+    }
+
+    @Override
     public String canonicalize(String document) throws InvalidDocumentFormatException {
         return documentSigningFactory.getCanonicalizationStrategy().canonicalize(document);
     }
