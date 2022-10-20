@@ -5,19 +5,15 @@ import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
-import org.springframework.beans.factory.annotation.Value;
 
 public class SunPKCS11SecurityFactory implements SecurityFactory {
 
     private static final String PROVIDER_NAME = "SunPKCS11";
     private static final String KEY_STORE_TYPE = "PKCS11";
 
-    @Value("${pkcs11ConfigFilePath}")
-    private String pkcs11ConfigFilePath;
-    @Value("${keyStorePassword}")
-    private String keyStorePassword;
-    @Value("${certificateAlias}")
-    private String certificateAlias;
+    private final String pkcs11ConfigFilePath = "C:\\workspace\\eta-einvoice-signer\\pkcs11.cfg";
+    private final String keyStorePassword = "42131536";
+    private final String certificateAlias = "0x04c8978a8578c3f05d028ea8d6dac515f4092da4";
 
     private Provider provider;
 
