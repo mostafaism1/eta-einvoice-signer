@@ -18,6 +18,7 @@ public class BouncyCastleSecurityFactory implements SecurityFactory {
 
     public BouncyCastleSecurityFactory() {
         provider = new BouncyCastleProvider();
+        addSecurityProvider();
     }
 
     @Override

@@ -19,6 +19,7 @@ public class SunPKCS11SecurityFactory implements SecurityFactory {
 
     public SunPKCS11SecurityFactory() {
         provider = Security.getProvider(PROVIDER_NAME);
+        addSecurityProvider();
     }
 
     @Override
