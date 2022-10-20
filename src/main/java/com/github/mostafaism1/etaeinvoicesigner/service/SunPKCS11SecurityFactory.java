@@ -6,9 +6,7 @@ import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
-@Service
 public class SunPKCS11SecurityFactory implements SecurityFactory {
 
     private static final String PROVIDER_NAME = "SunPKCS11";

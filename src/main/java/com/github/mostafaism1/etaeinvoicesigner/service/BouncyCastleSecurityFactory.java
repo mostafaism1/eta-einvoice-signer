@@ -9,9 +9,7 @@ import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.springframework.stereotype.Service;
 
-@Service
 public class BouncyCastleSecurityFactory implements SecurityFactory {
 
     private static final String BASE_CERT_PATH = "src/main/resources/certs/";
