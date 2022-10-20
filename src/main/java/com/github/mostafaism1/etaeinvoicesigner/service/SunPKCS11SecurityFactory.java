@@ -6,7 +6,9 @@ import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 
-public class SunPKCS11SecurityFactory implements SecurityFactory {
+public enum SunPKCS11SecurityFactory implements SecurityFactory {
+
+    INSTANCE;
 
     private static final String PROVIDER_NAME = "SunPKCS11";
     private static final String KEY_STORE_TYPE = "PKCS11";
@@ -17,7 +19,7 @@ public class SunPKCS11SecurityFactory implements SecurityFactory {
 
     private Provider provider;
 
-    public SunPKCS11SecurityFactory() {
+    private SunPKCS11SecurityFactory() {
         provider = Security.getProvider(PROVIDER_NAME);
         addSecurityProvider();
     }
