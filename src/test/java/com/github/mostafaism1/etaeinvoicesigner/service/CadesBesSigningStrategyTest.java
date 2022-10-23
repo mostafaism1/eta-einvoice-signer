@@ -26,6 +26,7 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1UTCTime;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.ess.ESSCertIDv2;
@@ -278,11 +279,10 @@ public class CadesBesSigningStrategyTest {
         // Given.
         ASN1ObjectIdentifier messageDigestOID = PKCSObjectIdentifiers.pkcs_9_at_messageDigest;
         MessageDigest digester = MessageDigest.getInstance("SHA-256");
-        DEROctetString expected = new DEROctetString(digester.digest(input.getBytes()));
+        DERSet expected = new DERSet(new DEROctetString(digester.digest(input.getBytes())));
 
         // When.
-        ASN1Encodable actual =
-                signedAttributes.get(messageDigestOID).getAttrValues().getObjectAt(0);
+        ASN1Encodable actual = signedAttributes.get(messageDigestOID).getAttrValues();
 
         // then
         then(actual).isEqualTo(expected);
