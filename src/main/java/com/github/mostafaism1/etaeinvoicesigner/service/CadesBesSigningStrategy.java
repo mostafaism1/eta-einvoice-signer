@@ -8,8 +8,11 @@ import java.security.Provider;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.Base64;
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
@@ -63,7 +66,6 @@ public class CadesBesSigningStrategy implements SigningStrategy {
                 }
         }
 
-
         public CMSSignedData buildCMSSignedData(byte[] msg, boolean encapsulate)
                         throws CertificateEncodingException, NoSuchAlgorithmException,
                         OperatorCreationException, IOException, CMSException {
@@ -115,8 +117,19 @@ public class CadesBesSigningStrategy implements SigningStrategy {
                         throws NoSuchAlgorithmException, CertificateEncodingException {
 
                 ASN1EncodableVector signedAttributes = new ASN1EncodableVector();
+                signedAttributes.add(buildMessageDigestAttribute(msg));
                 signedAttributes.add(buildSigningCertificateV2Attribute());
                 return new AttributeTable(signedAttributes);
+        }
+
+        private ASN1Encodable buildMessageDigestAttribute(byte[] msg)
+                        throws NoSuchAlgorithmException {
+                MessageDigest digester = MessageDigest.getInstance(DIGEST_ALGORITHM);
+                byte[] digest = digester.digest(msg);
+                ASN1ObjectIdentifier attributeIdentifier = ASN1ObjectIdentifier
+                                .getInstance(PKCSObjectIdentifiers.pkcs_9_at_messageDigest);
+                ASN1Set attributeValue = new DERSet(new DEROctetString(digest));
+                return new Attribute(attributeIdentifier, attributeValue);
         }
 
         private Attribute buildSigningCertificateV2Attribute()
