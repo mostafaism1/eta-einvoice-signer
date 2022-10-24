@@ -1,6 +1,7 @@
 package com.github.mostafaism1.etaeinvoicesigner.service;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -57,7 +58,8 @@ public class CadesBesSigningStrategy implements SigningStrategy {
         public String sign(String data) {
                 CMSSignedData signedData;
                 try {
-                        signedData = buildCMSSignedData(data.getBytes(), false);
+                        signedData = buildCMSSignedData(data.getBytes(StandardCharsets.UTF_8),
+                                        false);
                         return Base64.getEncoder().encodeToString(signedData.getEncoded());
                 } catch (CertificateEncodingException | OperatorCreationException
                                 | NoSuchAlgorithmException | CMSException | IOException e) {
