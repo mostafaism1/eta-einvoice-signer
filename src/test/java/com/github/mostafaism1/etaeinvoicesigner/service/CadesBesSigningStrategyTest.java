@@ -4,6 +4,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -274,12 +275,13 @@ public class CadesBesSigningStrategyTest {
     }
 
     @Test
-    public void signerInfo_signedAttrs_MessageDigest_should_contain_Der_Octet_String_format_for_SHA256_Hash_of_the_data_to_be_signed()
+    public void signerInfo_signedAttrs_MessageDigest_should_contain_Der_Octet_String_format_for_SHA256_Hash_of_the_UTF8_encoding_of_the_data_to_be_signed()
             throws CMSException, NoSuchAlgorithmException, OperatorCreationException {
         // Given.
         ASN1ObjectIdentifier messageDigestOID = PKCSObjectIdentifiers.pkcs_9_at_messageDigest;
         MessageDigest digester = MessageDigest.getInstance("SHA-256");
-        DERSet expected = new DERSet(new DEROctetString(digester.digest(input.getBytes())));
+        DERSet expected = new DERSet(
+                new DEROctetString(digester.digest(input.getBytes(StandardCharsets.UTF_8))));
 
         // When.
         ASN1Encodable actual = signedAttributes.get(messageDigestOID).getAttrValues();
