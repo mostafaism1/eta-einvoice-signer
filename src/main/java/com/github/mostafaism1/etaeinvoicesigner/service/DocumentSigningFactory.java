@@ -1,13 +1,11 @@
 package com.github.mostafaism1.etaeinvoicesigner.service;
 
 public interface DocumentSigningFactory {
+  CanonicalizationStrategy getCanonicalizationStrategy();
 
-    CanonicalizationStrategy getCanonicalizationStrategy();
+  SigningStrategy getSigningStrategy();
 
-    SigningStrategy getSigningStrategy();
+  SignatureMergeStrategy getSignatureMergeStrategy();
 
-    SignatureMergeStrategy getSignatureMergeStrategy();
-
-    SecurityFactory getSecurityFactory();
-
+  SecurityFactory getSecurityFactory();
 }

@@ -5,13 +5,11 @@ import java.security.Provider;
 import java.security.cert.X509Certificate;
 
 public interface SecurityFactory {
+  void addSecurityProvider();
 
-    void addSecurityProvider();
+  PrivateKey getPrivateKey();
 
-    PrivateKey getPrivateKey();
+  X509Certificate getCertificate();
 
-    X509Certificate getCertificate();
-
-    Provider getProvider();
-
+  Provider getProvider();
 }

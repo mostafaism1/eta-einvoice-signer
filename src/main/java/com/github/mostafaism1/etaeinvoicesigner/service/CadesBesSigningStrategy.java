@@ -39,115 +39,128 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 
 public class CadesBesSigningStrategy implements SigningStrategy {
+  private static final Provider DIGEST_PROVIDER = new BouncyCastleProvider();
+  private static final String DIGEST_ALGORITHM = "SHA-256";
+  private static final String SIGNATURE_ALGORITHM = "SHA256withRSAEncryption";
 
-        private static final Provider DIGEST_PROVIDER = new BouncyCastleProvider();
-        private static final String DIGEST_ALGORITHM = "SHA-256";
-        private static final String SIGNATURE_ALGORITHM = "SHA256withRSAEncryption";
+  private Provider signatureProvider;
+  private PrivateKey signingKey;
+  private Certificate signingCert;
 
-        private Provider signatureProvider;
-        private PrivateKey signingKey;
-        private Certificate signingCert;
+  public CadesBesSigningStrategy(SecurityFactory securityFactory) {
+    this.signatureProvider = securityFactory.getProvider();
+    this.signingKey = securityFactory.getPrivateKey();
+    this.signingCert = securityFactory.getCertificate();
+  }
 
-        public CadesBesSigningStrategy(SecurityFactory securityFactory) {
-                this.signatureProvider = securityFactory.getProvider();
-                this.signingKey = securityFactory.getPrivateKey();
-                this.signingCert = securityFactory.getCertificate();
-        }
+  @Override
+  public String sign(String data) {
+    CMSSignedData signedData;
+    try {
+      signedData =
+        buildCMSSignedData(data.getBytes(StandardCharsets.UTF_8), false);
+      return Base64.getEncoder().encodeToString(signedData.getEncoded());
+    } catch (
+      CertificateEncodingException
+      | OperatorCreationException
+      | NoSuchAlgorithmException
+      | CMSException
+      | IOException e
+    ) {
+      e.printStackTrace();
+      return null;
+    }
+  }
 
-        @Override
-        public String sign(String data) {
-                CMSSignedData signedData;
-                try {
-                        signedData = buildCMSSignedData(data.getBytes(StandardCharsets.UTF_8),
-                                        false);
-                        return Base64.getEncoder().encodeToString(signedData.getEncoded());
-                } catch (CertificateEncodingException | OperatorCreationException
-                                | NoSuchAlgorithmException | CMSException | IOException e) {
-                        e.printStackTrace();
-                        return null;
-                }
-        }
+  public CMSSignedData buildCMSSignedData(byte[] msg, boolean encapsulate)
+    throws CertificateEncodingException, NoSuchAlgorithmException, OperatorCreationException, IOException, CMSException {
+    CMSSignedDataGenerator signedDataGenerator = buildCMSSignedDataGenerator(
+      msg
+    );
+    CMSTypedData cmsTypedData = new CMSProcessableByteArray(
+      PKCSObjectIdentifiers.digestedData,
+      msg
+    );
+    return signedDataGenerator.generate(cmsTypedData, false);
+  }
 
-        public CMSSignedData buildCMSSignedData(byte[] msg, boolean encapsulate)
-                        throws CertificateEncodingException, NoSuchAlgorithmException,
-                        OperatorCreationException, IOException, CMSException {
+  private CMSSignedDataGenerator buildCMSSignedDataGenerator(byte[] msg)
+    throws CertificateEncodingException, OperatorCreationException, NoSuchAlgorithmException, IOException, CMSException {
+    SignerInfoGenerator signerInfoGenerator = buildSignerInfoGenerator(msg);
+    CMSSignedDataGenerator signedDataGenerator = new CMSSignedDataGenerator();
+    signedDataGenerator.addSignerInfoGenerator(signerInfoGenerator);
+    signedDataGenerator.addCertificate(
+      new X509CertificateHolder(signingCert.getEncoded())
+    );
+    return signedDataGenerator;
+  }
 
-                CMSSignedDataGenerator signedDataGenerator = buildCMSSignedDataGenerator(msg);
-                CMSTypedData cmsTypedData = new CMSProcessableByteArray(
-                                PKCSObjectIdentifiers.digestedData, msg);
-                return signedDataGenerator.generate(cmsTypedData, false);
-        }
+  private SignerInfoGenerator buildSignerInfoGenerator(byte[] msg)
+    throws CertificateEncodingException, NoSuchAlgorithmException, OperatorCreationException, IOException {
+    AttributeTable signedAttributesTable = buildSignedAttributeTable(msg);
 
-        private CMSSignedDataGenerator buildCMSSignedDataGenerator(byte[] msg)
-                        throws CertificateEncodingException, OperatorCreationException,
-                        NoSuchAlgorithmException, IOException, CMSException {
+    CMSAttributeTableGenerator signedAttributeGenerator = new DefaultSignedAttributeTableGenerator(
+      signedAttributesTable
+    );
 
-                SignerInfoGenerator signerInfoGenerator = buildSignerInfoGenerator(msg);
-                CMSSignedDataGenerator signedDataGenerator = new CMSSignedDataGenerator();
-                signedDataGenerator.addSignerInfoGenerator(signerInfoGenerator);
-                signedDataGenerator.addCertificate(
-                                new X509CertificateHolder(signingCert.getEncoded()));
-                return signedDataGenerator;
-        }
+    ContentSigner contentSigner = new JcaContentSignerBuilder(
+      SIGNATURE_ALGORITHM
+    )
+      .setProvider(signatureProvider)
+      .build(signingKey);
 
-        private SignerInfoGenerator buildSignerInfoGenerator(byte[] msg)
-                        throws CertificateEncodingException, NoSuchAlgorithmException,
-                        OperatorCreationException, IOException {
+    DigestCalculatorProvider digestCalcProvider = new JcaDigestCalculatorProviderBuilder()
+      .setProvider(DIGEST_PROVIDER)
+      .build();
+    SignerInfoGenerator signerInfoGenerator = new SignerInfoGeneratorBuilder(
+      digestCalcProvider
+    )
+      .setSignedAttributeGenerator(signedAttributeGenerator)
+      .setUnsignedAttributeGenerator(null)
+      .build(
+        contentSigner,
+        new X509CertificateHolder(signingCert.getEncoded())
+      );
+    return signerInfoGenerator;
+  }
 
-                AttributeTable signedAttributesTable = buildSignedAttributeTable(msg);
+  private AttributeTable buildSignedAttributeTable(byte[] msg)
+    throws NoSuchAlgorithmException, CertificateEncodingException {
+    ASN1EncodableVector signedAttributes = new ASN1EncodableVector();
+    signedAttributes.add(buildMessageDigestAttribute(msg));
+    signedAttributes.add(buildSigningCertificateV2Attribute());
+    return new AttributeTable(signedAttributes);
+  }
 
-                CMSAttributeTableGenerator signedAttributeGenerator =
-                                new DefaultSignedAttributeTableGenerator(signedAttributesTable);
+  private ASN1Encodable buildMessageDigestAttribute(byte[] msg)
+    throws NoSuchAlgorithmException {
+    MessageDigest digester = MessageDigest.getInstance(DIGEST_ALGORITHM);
+    byte[] digest = digester.digest(msg);
+    ASN1ObjectIdentifier attributeIdentifier = ASN1ObjectIdentifier.getInstance(
+      PKCSObjectIdentifiers.pkcs_9_at_messageDigest
+    );
+    ASN1Set attributeValue = new DERSet(new DEROctetString(digest));
+    return new Attribute(attributeIdentifier, attributeValue);
+  }
 
-                ContentSigner contentSigner = new JcaContentSignerBuilder(SIGNATURE_ALGORITHM)
-                                .setProvider(signatureProvider).build(signingKey);
-
-                DigestCalculatorProvider digestCalcProvider =
-                                new JcaDigestCalculatorProviderBuilder()
-                                                .setProvider(DIGEST_PROVIDER).build();
-                SignerInfoGenerator signerInfoGenerator =
-                                new SignerInfoGeneratorBuilder(digestCalcProvider)
-                                                .setSignedAttributeGenerator(
-                                                                signedAttributeGenerator)
-                                                .setUnsignedAttributeGenerator(null)
-                                                .build(contentSigner, new X509CertificateHolder(
-                                                                signingCert.getEncoded()));
-                return signerInfoGenerator;
-        }
-
-        private AttributeTable buildSignedAttributeTable(byte[] msg)
-                        throws NoSuchAlgorithmException, CertificateEncodingException {
-
-                ASN1EncodableVector signedAttributes = new ASN1EncodableVector();
-                signedAttributes.add(buildMessageDigestAttribute(msg));
-                signedAttributes.add(buildSigningCertificateV2Attribute());
-                return new AttributeTable(signedAttributes);
-        }
-
-        private ASN1Encodable buildMessageDigestAttribute(byte[] msg)
-                        throws NoSuchAlgorithmException {
-                MessageDigest digester = MessageDigest.getInstance(DIGEST_ALGORITHM);
-                byte[] digest = digester.digest(msg);
-                ASN1ObjectIdentifier attributeIdentifier = ASN1ObjectIdentifier
-                                .getInstance(PKCSObjectIdentifiers.pkcs_9_at_messageDigest);
-                ASN1Set attributeValue = new DERSet(new DEROctetString(digest));
-                return new Attribute(attributeIdentifier, attributeValue);
-        }
-
-        private Attribute buildSigningCertificateV2Attribute()
-                        throws CertificateEncodingException, NoSuchAlgorithmException {
-
-                MessageDigest digester = MessageDigest.getInstance(DIGEST_ALGORITHM);
-                ASN1ObjectIdentifier attributeIdentifier = ASN1ObjectIdentifier
-                                .getInstance(PKCSObjectIdentifiers.id_aa_signingCertificateV2);
-                AlgorithmIdentifier algorithmIdentifier =
-                                new AlgorithmIdentifier(attributeIdentifier);
-                ESSCertIDv2 essCert = new ESSCertIDv2(algorithmIdentifier,
-                                digester.digest(signingCert.getEncoded()));
-                ESSCertIDv2[] essCerts = {essCert};
-                SigningCertificateV2 signingCertificateV2 = new SigningCertificateV2(essCerts);
-                DERSet attributeValue = new DERSet(signingCertificateV2);
-                return new Attribute(attributeIdentifier, attributeValue);
-        }
-
+  private Attribute buildSigningCertificateV2Attribute()
+    throws CertificateEncodingException, NoSuchAlgorithmException {
+    MessageDigest digester = MessageDigest.getInstance(DIGEST_ALGORITHM);
+    ASN1ObjectIdentifier attributeIdentifier = ASN1ObjectIdentifier.getInstance(
+      PKCSObjectIdentifiers.id_aa_signingCertificateV2
+    );
+    AlgorithmIdentifier algorithmIdentifier = new AlgorithmIdentifier(
+      attributeIdentifier
+    );
+    ESSCertIDv2 essCert = new ESSCertIDv2(
+      algorithmIdentifier,
+      digester.digest(signingCert.getEncoded())
+    );
+    ESSCertIDv2[] essCerts = { essCert };
+    SigningCertificateV2 signingCertificateV2 = new SigningCertificateV2(
+      essCerts
+    );
+    DERSet attributeValue = new DERSet(signingCertificateV2);
+    return new Attribute(attributeIdentifier, attributeValue);
+  }
 }

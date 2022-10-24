@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class ETADocumentSigningService extends BaseDocumentSigningService {
 
-    @Override
-    protected DocumentSigningFactory getDocumentSigningFactory() {
-        return new ETADocumentSigningFactory();
-    }
+  @Override
+  protected DocumentSigningFactory getDocumentSigningFactory() {
+    return new ETADocumentSigningFactory();
+  }
 }

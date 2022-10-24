@@ -4,7 +4,5 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 public class ETADocumentSigningServiceTest {
-
-        private DocumentSigningService documentSigningService = new ETADocumentSigningService();
-
+  private DocumentSigningService documentSigningService = new ETADocumentSigningService();
 }

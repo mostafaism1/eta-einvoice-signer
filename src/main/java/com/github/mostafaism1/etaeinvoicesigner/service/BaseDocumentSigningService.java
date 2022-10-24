@@ -1,21 +1,25 @@
 package com.github.mostafaism1.etaeinvoicesigner.service;
 
-public abstract class BaseDocumentSigningService implements DocumentSigningService {
+public abstract class BaseDocumentSigningService
+  implements DocumentSigningService {
+  private DocumentSigningFactory documentSigningFactory;
 
-    private DocumentSigningFactory documentSigningFactory;
+  protected BaseDocumentSigningService() {
+    this.documentSigningFactory = getDocumentSigningFactory();
+  }
 
-    protected BaseDocumentSigningService() {
-        this.documentSigningFactory = getDocumentSigningFactory();
-    }
+  @Override
+  public String generateSignedDocument(String document) {
+    String canonicalizedDocument = documentSigningFactory
+      .getCanonicalizationStrategy()
+      .canonicalize(document);
+    String signature = documentSigningFactory
+      .getSigningStrategy()
+      .sign(canonicalizedDocument);
+    return documentSigningFactory
+      .getSignatureMergeStrategy()
+      .merge(document, signature);
+  }
 
-    @Override
-    public String generateSignedDocument(String document) {
-        String canonicalizedDocument =
-                documentSigningFactory.getCanonicalizationStrategy().canonicalize(document);
-        String signature = documentSigningFactory.getSigningStrategy().sign(canonicalizedDocument);
-        return documentSigningFactory.getSignatureMergeStrategy().merge(document, signature);
-    }
-
-    protected abstract DocumentSigningFactory getDocumentSigningFactory();
-
+  protected abstract DocumentSigningFactory getDocumentSigningFactory();
 }

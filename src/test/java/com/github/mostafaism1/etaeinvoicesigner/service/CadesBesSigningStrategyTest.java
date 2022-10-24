@@ -2,6 +2,7 @@ package com.github.mostafaism1.etaeinvoicesigner.service;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -47,7 +48,6 @@ import org.bouncycastle.util.StoreException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-
 /**
  * Testing strategy
  *
@@ -56,332 +56,370 @@ import org.junit.jupiter.api.Test;
  * expected value.
  */
 public class CadesBesSigningStrategyTest {
-    private SecurityFactory securityFactory;
-    private SigningStrategy signingStrategy;
+  private SecurityFactory securityFactory;
+  private SigningStrategy signingStrategy;
 
-    private String input;
-    private String base64SignedInput;
-    private byte[] signedInput;
-    private CMSSignedData signedData;
-    private SignerInformationStore signerInfos;
-    private SignerInformation signerInfo;
-    private AttributeTable signedAttributes;
+  private String input;
+  private String base64SignedInput;
+  private byte[] signedInput;
+  private CMSSignedData signedData;
+  private SignerInformationStore signerInfos;
+  private SignerInformation signerInfo;
+  private AttributeTable signedAttributes;
 
+  @BeforeEach
+  public void setup() {
+    securityFactory = new BouncyCastleSecurityFactory();
+    signingStrategy = new CadesBesSigningStrategy(securityFactory);
+    input = "input";
+    base64SignedInput = signingStrategy.sign(input);
+    signedInput = Base64.getDecoder().decode(base64SignedInput);
+    try {
+      signedData = new CMSSignedData(signedInput);
+      signerInfos = signedData.getSignerInfos();
+      signerInfo = signedData.getSignerInfos().getSigners().iterator().next();
+      signedAttributes = signerInfo.getSignedAttributes();
+    } catch (CMSException e) {
+      e.printStackTrace();
+    }
+  }
 
-    @BeforeEach
-    public void setup() {
-        securityFactory = new BouncyCastleSecurityFactory();
-        signingStrategy = new CadesBesSigningStrategy(securityFactory);
-        input = "input";
-        base64SignedInput = signingStrategy.sign(input);
-        signedInput = Base64.getDecoder().decode(base64SignedInput);
-        try {
-            signedData = new CMSSignedData(signedInput);
-            signerInfos = signedData.getSignerInfos();
-            signerInfo = signedData.getSignerInfos().getSigners().iterator().next();
-            signedAttributes = signerInfo.getSignedAttributes();
-        } catch (CMSException e) {
-            e.printStackTrace();
+  @Test
+  public void signature_should_be_a_CMS_SignedData_signature()
+    throws IOException, CMSException {
+    // When, then.
+    assertDoesNotThrow(() -> new CMSSignedData(signedInput));
+  }
+
+  @Test
+  public void signedData_version_should_be_3() throws CMSException {
+    // When.
+    int signedDataVersion = signedData.getVersion();
+
+    // Then.
+    then(signedDataVersion).isEqualTo(3);
+  }
+
+  @Test
+  public void signedData_digestAlgorithms_should_be_SHA256()
+    throws CMSException {
+    // Given.
+    AlgorithmIdentifier SHA256 = new AlgorithmIdentifier(
+      NISTObjectIdentifiers.id_sha256
+    );
+
+    // When.
+    Set<AlgorithmIdentifier> digestAlgorithms = signedData.getDigestAlgorithmIDs();
+
+    // Then.
+    then(digestAlgorithms).contains(SHA256);
+  }
+
+  @Test
+  public void signedData_encapContentInfo_contentType_should_be_digestData()
+    throws CMSException {
+    // Given.
+    String digestData = PKCSObjectIdentifiers.digestedData.toString();
+
+    // When.
+    String contentType = signedData.getSignedContentTypeOID();
+
+    // Then.
+    then(contentType).isEqualTo(digestData);
+  }
+
+  @Test
+  public void signedData_encapContentInfo_eContent_should_not_be_present()
+    throws CMSException {
+    // When.
+    boolean isDetachedSignature = signedData.isDetachedSignature();
+
+    // Then.
+    then(isDetachedSignature).isTrue();
+  }
+
+  @Test
+  public void signedData_certificates_should_contain_only_the_X509_certificate_of_the_signer()
+    throws CMSException, CertificateEncodingException, StoreException, IOException {
+    // When.
+    Store<X509CertificateHolder> certificateStore = signedData.getCertificates();
+    Collection<X509CertificateHolder> matches = certificateStore.getMatches(
+      new Selector<X509CertificateHolder>() {
+
+        @Override
+        public boolean match(X509CertificateHolder obj) {
+          return true;
         }
-    }
 
-    @Test
-    public void signature_should_be_a_CMS_SignedData_signature() throws IOException, CMSException {
-        // When, then.
-        assertDoesNotThrow(() -> new CMSSignedData(signedInput));
-    }
+        @Override
+        public Object clone() {
+          return null;
+        }
+      }
+    );
 
-    @Test
-    public void signedData_version_should_be_3() throws CMSException {
-        // When.
-        int signedDataVersion = signedData.getVersion();
+    // Then.
+    then(matches.size()).isEqualTo(1);
+  }
 
-        // Then.
-        then(signedDataVersion).isEqualTo(3);
-    }
+  @Test
+  public void signedData_signerInfos_should_contain_only_one_signerInfo_in_the_signature()
+    throws CMSException {
+    // Then.
+    then(signerInfos.size()).isEqualTo(1);
+  }
 
-    @Test
-    public void signedData_digestAlgorithms_should_be_SHA256() throws CMSException {
-        // Given.
-        AlgorithmIdentifier SHA256 = new AlgorithmIdentifier(NISTObjectIdentifiers.id_sha256);
+  @Test
+  public void signerInfo_version_should_be_1() throws CMSException {
+    // When.
+    int signerInfoVersion = signerInfo.getVersion();
 
-        // When.
-        Set<AlgorithmIdentifier> digestAlgorithms = signedData.getDigestAlgorithmIDs();
+    // Then.
+    then(signerInfoVersion).isEqualTo(1);
+  }
 
-        // Then.
-        then(digestAlgorithms).contains(SHA256);
-    }
+  @Test
+  public void signerInfo_sId_should_be_issuerAndSerialNumber_and_should_contain_the_serial_number_of_the_certificate_and_issuer_name()
+    throws CMSException, CertificateParsingException {
+    // Given.
+    String expectedIssuerName = securityFactory
+      .getCertificate()
+      .getIssuerX500Principal()
+      .getName();
+    BigInteger expectedSerialNumber = securityFactory
+      .getCertificate()
+      .getSerialNumber();
 
-    @Test
-    public void signedData_encapContentInfo_contentType_should_be_digestData() throws CMSException {
-        // Given.
-        String digestData = PKCSObjectIdentifiers.digestedData.toString();
+    // When.
+    String actualIssuerName = signerInfo.getSID().getIssuer().toString();
+    BigInteger actualSerialNumber = signerInfo.getSID().getSerialNumber();
 
-        // When.
-        String contentType = signedData.getSignedContentTypeOID();
+    // Then.
+    then(actualIssuerName).isEqualTo(expectedIssuerName);
+    then(actualSerialNumber).isEqualTo(expectedSerialNumber);
+  }
 
-        // Then.
-        then(contentType).isEqualTo(digestData);
-    }
+  @Test
+  public void signerInfo_digestAlgorithms_should_be_SHA256()
+    throws CMSException {
+    // Given.
+    String SHA256 = NISTObjectIdentifiers.id_sha256.toString();
 
-    @Test
-    public void signedData_encapContentInfo_eContent_should_not_be_present() throws CMSException {
-        // When.
-        boolean isDetachedSignature = signedData.isDetachedSignature();
+    // When.
+    String digestAlgorithms = signerInfo.getDigestAlgOID();
 
-        // Then.
-        then(isDetachedSignature).isTrue();
-    }
+    // Then.
+    then(digestAlgorithms).isEqualTo(SHA256);
+  }
 
-    @Test
-    public void signedData_certificates_should_contain_only_the_X509_certificate_of_the_signer()
-            throws CMSException, CertificateEncodingException, StoreException, IOException {
-        // When.
-        Store<X509CertificateHolder> certificateStore = signedData.getCertificates();
-        Collection<X509CertificateHolder> matches =
-                certificateStore.getMatches(new Selector<X509CertificateHolder>() {
-                    @Override
-                    public boolean match(X509CertificateHolder obj) {
-                        return true;
-                    }
+  @Test
+  public void signerInfo_signedAttrs_should_contain_at_least_4_attributes()
+    throws CMSException {
+    // Then.
+    then(signedAttributes.size()).isGreaterThanOrEqualTo(4);
+  }
 
-                    @Override
-                    public Object clone() {
-                        return null;
-                    }
+  @Test
+  public void signerInfo_signedAttrs_should_contain_a_contentType_attribute()
+    throws CMSException {
+    // Given.
+    ASN1ObjectIdentifier contentTypeOID =
+      PKCSObjectIdentifiers.pkcs_9_at_contentType;
 
-                });
+    // When.
+    Attribute contentTypeAttribute = signedAttributes.get(contentTypeOID);
 
-        // Then.
-        then(matches.size()).isEqualTo(1);
-    }
+    // Then.
+    then(contentTypeAttribute).isNotNull();
+  }
 
-    @Test
-    public void signedData_signerInfos_should_contain_only_one_signerInfo_in_the_signature()
-            throws CMSException {
-        // Then.
-        then(signerInfos.size()).isEqualTo(1);
-    }
+  @Test
+  public void signerInfo_signedAttrs_should_contain_the_a_messageDigest_attribute()
+    throws CMSException {
+    // Given.
+    ASN1ObjectIdentifier messageDigestOID =
+      PKCSObjectIdentifiers.pkcs_9_at_messageDigest;
 
-    @Test
-    public void signerInfo_version_should_be_1() throws CMSException {
-        // When.
-        int signerInfoVersion = signerInfo.getVersion();
+    // When.
+    Attribute messageDigestAttribute = signedAttributes.get(messageDigestOID);
 
-        // Then.
-        then(signerInfoVersion).isEqualTo(1);
-    }
+    // Then.
+    then(messageDigestAttribute).isNotNull();
+  }
 
-    @Test
-    public void signerInfo_sId_should_be_issuerAndSerialNumber_and_should_contain_the_serial_number_of_the_certificate_and_issuer_name()
-            throws CMSException, CertificateParsingException {
-        // Given.
-        String expectedIssuerName =
-                securityFactory.getCertificate().getIssuerX500Principal().getName();
-        BigInteger expectedSerialNumber = securityFactory.getCertificate().getSerialNumber();
+  @Test
+  public void signerInfo_signedAttrs_should_contain_a_signingTime_attribute()
+    throws CMSException {
+    // Given.
+    ASN1ObjectIdentifier signingTimeOID =
+      PKCSObjectIdentifiers.pkcs_9_at_signingTime;
 
-        // When.
-        String actualIssuerName = signerInfo.getSID().getIssuer().toString();
-        BigInteger actualSerialNumber = signerInfo.getSID().getSerialNumber();
+    // When.
+    Attribute signingTimeAttribute = signedAttributes.get(signingTimeOID);
 
-        // Then.
-        then(actualIssuerName).isEqualTo(expectedIssuerName);
-        then(actualSerialNumber).isEqualTo(expectedSerialNumber);
-    }
+    // Then.
+    then(signingTimeAttribute).isNotNull();
+  }
 
-    @Test
-    public void signerInfo_digestAlgorithms_should_be_SHA256() throws CMSException {
-        // Given.
-        String SHA256 = NISTObjectIdentifiers.id_sha256.toString();
+  @Test
+  public void signerInfo_signedAttrs_should_contain_an_ESSSigningCertificatV2_attribute()
+    throws CMSException {
+    // Given.
+    ASN1ObjectIdentifier signingCertificateV2OID =
+      PKCSObjectIdentifiers.id_aa_signingCertificateV2;
 
-        // When.
-        String digestAlgorithms = signerInfo.getDigestAlgOID();
+    // When.
+    Attribute ESSSigningCertificatV2Attribute = signedAttributes.get(
+      signingCertificateV2OID
+    );
 
-        // Then.
-        then(digestAlgorithms).isEqualTo(SHA256);
-    }
+    // Then.
+    then(ESSSigningCertificatV2Attribute).isNotNull();
+  }
 
-    @Test
-    public void signerInfo_signedAttrs_should_contain_at_least_4_attributes() throws CMSException {
-        // Then.
-        then(signedAttributes.size()).isGreaterThanOrEqualTo(4);
-    }
+  @Test
+  public void signerInfo_signedAttrs_ContentType_should_be_DigestData()
+    throws CMSException {
+    // Given.
+    ASN1ObjectIdentifier contentTypeOID =
+      PKCSObjectIdentifiers.pkcs_9_at_contentType;
+    ASN1ObjectIdentifier digestedData = PKCSObjectIdentifiers.digestedData;
 
-    @Test
-    public void signerInfo_signedAttrs_should_contain_a_contentType_attribute()
-            throws CMSException {
-        // Given.
-        ASN1ObjectIdentifier contentTypeOID = PKCSObjectIdentifiers.pkcs_9_at_contentType;
+    // When.
+    ASN1Encodable contentType = signedAttributes
+      .get(contentTypeOID)
+      .getAttrValues()
+      .getObjectAt(0);
 
-        // When.
-        Attribute contentTypeAttribute = signedAttributes.get(contentTypeOID);
+    // Then.
+    then(contentType).isEqualTo(digestedData);
+  }
 
-        // Then.
-        then(contentTypeAttribute).isNotNull();
-    }
+  @Test
+  public void signerInfo_signedAttrs_MessageDigest_should_contain_Der_Octet_String_format_for_SHA256_Hash_of_the_UTF8_encoding_of_the_data_to_be_signed()
+    throws CMSException, NoSuchAlgorithmException, OperatorCreationException {
+    // Given.
+    ASN1ObjectIdentifier messageDigestOID =
+      PKCSObjectIdentifiers.pkcs_9_at_messageDigest;
+    MessageDigest digester = MessageDigest.getInstance("SHA-256");
+    DERSet expected = new DERSet(
+      new DEROctetString(
+        digester.digest(input.getBytes(StandardCharsets.UTF_8))
+      )
+    );
 
-    @Test
-    public void signerInfo_signedAttrs_should_contain_the_a_messageDigest_attribute()
-            throws CMSException {
-        // Given.
-        ASN1ObjectIdentifier messageDigestOID = PKCSObjectIdentifiers.pkcs_9_at_messageDigest;
+    // When.
+    ASN1Encodable actual = signedAttributes
+      .get(messageDigestOID)
+      .getAttrValues();
 
-        // When.
-        Attribute messageDigestAttribute = signedAttributes.get(messageDigestOID);
+    // then
+    then(actual).isEqualTo(expected);
+  }
 
-        // Then.
-        then(messageDigestAttribute).isNotNull();
-    }
+  @Test
+  public void signerInfo_signedAttrs_ESSSigningCertificateV2_should_contains_SHA256_hash_of_the_signer_certificate()
+    throws CMSException, NoSuchAlgorithmException, CertificateEncodingException, IOException {
+    // Given.
+    ASN1ObjectIdentifier signingCertificateV2OID =
+      PKCSObjectIdentifiers.id_aa_signingCertificateV2;
+    MessageDigest digester = MessageDigest.getInstance("SHA-256");
+    byte[] expected = digester.digest(
+      securityFactory.getCertificate().getEncoded()
+    );
 
-    @Test
-    public void signerInfo_signedAttrs_should_contain_a_signingTime_attribute()
-            throws CMSException {
-        // Given.
-        ASN1ObjectIdentifier signingTimeOID = PKCSObjectIdentifiers.pkcs_9_at_signingTime;
+    // When.
+    ASN1Encodable certificateDigest = signedAttributes
+      .get(signingCertificateV2OID)
+      .getAttrValues()
+      .getObjectAt(0);
+    SigningCertificateV2 signingCertificateV2 = SigningCertificateV2.getInstance(
+      certificateDigest
+    );
+    ESSCertIDv2 certIDv2 = signingCertificateV2.getCerts()[0];
+    byte[] actual = certIDv2.getCertHash();
 
-        // When.
-        Attribute signingTimeAttribute = signedAttributes.get(signingTimeOID);
+    // Then.
+    then(actual).isEqualTo(expected);
+  }
 
-        // Then.
-        then(signingTimeAttribute).isNotNull();
-    }
+  @Test
+  public void signerInfo_signedAttrs_SigningTime_should_be_the_machine_time_in_UTC()
+    throws CMSException, ParseException, InterruptedException {
+    // Given.
+    ASN1ObjectIdentifier signingTimeOID =
+      PKCSObjectIdentifiers.pkcs_9_at_signingTime;
+    final int UTCTIME_LOWEST_TIME_RESOLUTION_IN_SECONDS = 1;
+    Date before = new Date();
+    TimeUnit.SECONDS.sleep(UTCTIME_LOWEST_TIME_RESOLUTION_IN_SECONDS);
+    base64SignedInput = signingStrategy.sign(input);
+    signedInput = Base64.getDecoder().decode(base64SignedInput);
+    CMSSignedData signedData = new CMSSignedData(signedInput);
+    TimeUnit.SECONDS.sleep(UTCTIME_LOWEST_TIME_RESOLUTION_IN_SECONDS);
+    Date after = new Date();
 
-    @Test
-    public void signerInfo_signedAttrs_should_contain_an_ESSSigningCertificatV2_attribute()
-            throws CMSException {
-        // Given.
-        ASN1ObjectIdentifier signingCertificateV2OID =
-                PKCSObjectIdentifiers.id_aa_signingCertificateV2;
+    // When.
+    SignerInformation signerInfo = signedData
+      .getSignerInfos()
+      .getSigners()
+      .iterator()
+      .next();
+    ASN1Encodable signingTime = signerInfo
+      .getSignedAttributes()
+      .get(signingTimeOID)
+      .getAttrValues()
+      .getObjectAt(0);
 
-        // When.
-        Attribute ESSSigningCertificatV2Attribute = signedAttributes.get(signingCertificateV2OID);
+    ASN1UTCTime ASN1UTCTime = org.bouncycastle.asn1.ASN1UTCTime.getInstance(
+      signingTime
+    );
+    Date date = ASN1UTCTime.getDate();
 
-        // Then.
-        then(ESSSigningCertificatV2Attribute).isNotNull();
-    }
+    // Then.
+    then(before.before(date)).isTrue();
+    then(after.after(date)).isTrue();
+  }
 
-    @Test
-    public void signerInfo_signedAttrs_ContentType_should_be_DigestData() throws CMSException {
-        // Given.
-        ASN1ObjectIdentifier contentTypeOID = PKCSObjectIdentifiers.pkcs_9_at_contentType;
-        ASN1ObjectIdentifier digestedData = PKCSObjectIdentifiers.digestedData;
+  @Test
+  public void signerInfo_signatureAlgorithm_SignatureAlgorithmIdentifier_should_be_sha256WithRSAEncryption()
+    throws CMSException {
+    // Given.
+    String sha256WithRSAEncryption = PKCSObjectIdentifiers.sha256WithRSAEncryption.toString();
 
-        // When.
-        ASN1Encodable contentType =
-                signedAttributes.get(contentTypeOID).getAttrValues().getObjectAt(0);
+    // When.
+    String signatureAlgorithmIdentifier = signerInfo.getEncryptionAlgOID();
 
-        // Then.
-        then(contentType).isEqualTo(digestedData);
-    }
+    // Then.
+    then(signatureAlgorithmIdentifier).isEqualTo(sha256WithRSAEncryption);
+  }
 
-    @Test
-    public void signerInfo_signedAttrs_MessageDigest_should_contain_Der_Octet_String_format_for_SHA256_Hash_of_the_UTF8_encoding_of_the_data_to_be_signed()
-            throws CMSException, NoSuchAlgorithmException, OperatorCreationException {
-        // Given.
-        ASN1ObjectIdentifier messageDigestOID = PKCSObjectIdentifiers.pkcs_9_at_messageDigest;
-        MessageDigest digester = MessageDigest.getInstance("SHA-256");
-        DERSet expected = new DERSet(
-                new DEROctetString(digester.digest(input.getBytes(StandardCharsets.UTF_8))));
+  @Test
+  public void signerInfo_Signature_should_be_Signature_value_computed_on_the_user_data_and_on_the_signed_attributes_using_the_signer_private_key_with_Algorithm_sha256WithRSAEncryption()
+    throws CMSException, NoSuchAlgorithmException, IOException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException, CertificateException, OperatorCreationException, SignatureException {
+    // Given.
+    byte[] signature = signerInfo.getSignature();
+    Signature verifier = Signature.getInstance(
+      "SHA256withRSAEncryption",
+      securityFactory.getProvider()
+    );
+    verifier.initVerify(securityFactory.getCertificate().getPublicKey());
 
-        // When.
-        ASN1Encodable actual = signedAttributes.get(messageDigestOID).getAttrValues();
+    // When.
+    byte[] encodedSignedAttributes = signerInfo.getEncodedSignedAttributes();
+    verifier.update(encodedSignedAttributes);
+    boolean verified = verifier.verify(signature);
 
-        // then
-        then(actual).isEqualTo(expected);
+    // Then.
+    then(verified).isTrue();
+  }
 
-    }
+  @Test
+  public void signerInfo_unsignedAttrs_should_not_be_present()
+    throws CMSException {
+    // When.
+    AttributeTable unsignedAttributes = signerInfo.getUnsignedAttributes();
 
-    @Test
-    public void signerInfo_signedAttrs_ESSSigningCertificateV2_should_contains_SHA256_hash_of_the_signer_certificate()
-            throws CMSException, NoSuchAlgorithmException, CertificateEncodingException,
-            IOException {
-        // Given.
-        ASN1ObjectIdentifier signingCertificateV2OID =
-                PKCSObjectIdentifiers.id_aa_signingCertificateV2;
-        MessageDigest digester = MessageDigest.getInstance("SHA-256");
-        byte[] expected = digester.digest(securityFactory.getCertificate().getEncoded());
-
-        // When.
-        ASN1Encodable certificateDigest =
-                signedAttributes.get(signingCertificateV2OID).getAttrValues().getObjectAt(0);
-        SigningCertificateV2 signingCertificateV2 =
-                SigningCertificateV2.getInstance(certificateDigest);
-        ESSCertIDv2 certIDv2 = signingCertificateV2.getCerts()[0];
-        byte[] actual = certIDv2.getCertHash();
-
-        // Then.
-        then(actual).isEqualTo(expected);
-    }
-
-    @Test
-    public void signerInfo_signedAttrs_SigningTime_should_be_the_machine_time_in_UTC()
-            throws CMSException, ParseException, InterruptedException {
-        // Given.
-        ASN1ObjectIdentifier signingTimeOID = PKCSObjectIdentifiers.pkcs_9_at_signingTime;
-        final int UTCTIME_LOWEST_TIME_RESOLUTION_IN_SECONDS = 1;
-        Date before = new Date();
-        TimeUnit.SECONDS.sleep(UTCTIME_LOWEST_TIME_RESOLUTION_IN_SECONDS);
-        base64SignedInput = signingStrategy.sign(input);
-        signedInput = Base64.getDecoder().decode(base64SignedInput);
-        CMSSignedData signedData = new CMSSignedData(signedInput);
-        TimeUnit.SECONDS.sleep(UTCTIME_LOWEST_TIME_RESOLUTION_IN_SECONDS);
-        Date after = new Date();
-
-        // When.
-        SignerInformation signerInfo = signedData.getSignerInfos().getSigners().iterator().next();
-        ASN1Encodable signingTime =
-                signerInfo.getSignedAttributes().get(signingTimeOID).getAttrValues().getObjectAt(0);
-
-        ASN1UTCTime ASN1UTCTime = org.bouncycastle.asn1.ASN1UTCTime.getInstance(signingTime);
-        Date date = ASN1UTCTime.getDate();
-
-        // Then.
-        then(before.before(date)).isTrue();
-        then(after.after(date)).isTrue();
-    }
-
-    @Test
-    public void signerInfo_signatureAlgorithm_SignatureAlgorithmIdentifier_should_be_sha256WithRSAEncryption()
-            throws CMSException {
-        // Given.
-        String sha256WithRSAEncryption = PKCSObjectIdentifiers.sha256WithRSAEncryption.toString();
-
-        // When.
-        String signatureAlgorithmIdentifier = signerInfo.getEncryptionAlgOID();
-
-        // Then.
-        then(signatureAlgorithmIdentifier).isEqualTo(sha256WithRSAEncryption);
-    }
-
-    @Test
-    public void signerInfo_Signature_should_be_Signature_value_computed_on_the_user_data_and_on_the_signed_attributes_using_the_signer_private_key_with_Algorithm_sha256WithRSAEncryption()
-            throws CMSException, NoSuchAlgorithmException, IOException, NoSuchPaddingException,
-            InvalidKeyException, IllegalBlockSizeException, BadPaddingException,
-            InvalidKeySpecException, CertificateException, OperatorCreationException,
-            SignatureException {
-        // Given.
-        byte[] signature = signerInfo.getSignature();
-        Signature verifier =
-                Signature.getInstance("SHA256withRSAEncryption", securityFactory.getProvider());
-        verifier.initVerify(securityFactory.getCertificate().getPublicKey());
-
-        // When.
-        byte[] encodedSignedAttributes = signerInfo.getEncodedSignedAttributes();
-        verifier.update(encodedSignedAttributes);
-        boolean verified = verifier.verify(signature);
-
-        // Then.
-        then(verified).isTrue();
-    }
-
-
-    @Test
-    public void signerInfo_unsignedAttrs_should_not_be_present() throws CMSException {
-        // When.
-        AttributeTable unsignedAttributes = signerInfo.getUnsignedAttributes();
-
-        // Then.
-        then(unsignedAttributes).isNull();
-    }
-
+    // Then.
+    then(unsignedAttributes).isNull();
+  }
 }
