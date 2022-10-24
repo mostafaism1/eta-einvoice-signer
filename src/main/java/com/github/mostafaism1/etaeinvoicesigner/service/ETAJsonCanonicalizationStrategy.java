@@ -46,13 +46,13 @@ public class ETAJsonCanonicalizationStrategy implements CanonicalizationStrategy
 
     private String dispatchToCanonicalize(JsonElement jsonElement, String key) {
         if (jsonElement.isJsonNull()) {
-            return canonicalizeJsonNull((JsonNull) jsonElement);
+            return canonicalizeJsonNull(jsonElement.getAsJsonNull());
         } else if (jsonElement.isJsonPrimitive()) {
-            return canonicalizeJsonPrimitive((JsonPrimitive) jsonElement);
+            return canonicalizeJsonPrimitive(jsonElement.getAsJsonPrimitive());
         } else if (jsonElement.isJsonArray()) {
-            return canonicalizeJsonArray((JsonArray) jsonElement, key);
+            return canonicalizeJsonArray(jsonElement.getAsJsonArray(), key);
         } else if (jsonElement.isJsonObject()) {
-            return canonicalizeJsonObject((JsonObject) jsonElement);
+            return canonicalizeJsonObject(jsonElement.getAsJsonObject());
         } else {
             throw new JsonSyntaxException(jsonElement + " is not a valid JsonElement");
         }
