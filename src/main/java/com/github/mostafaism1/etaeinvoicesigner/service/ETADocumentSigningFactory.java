@@ -19,6 +19,6 @@ public class ETADocumentSigningFactory implements DocumentSigningFactory {
 
   @Override
   public SecurityFactory getSecurityFactory() {
-    return SunPKCS11SecurityFactory.INSTANCE;
+    return HardwareTokenSecurityFactory.INSTANCE;
   }
 }

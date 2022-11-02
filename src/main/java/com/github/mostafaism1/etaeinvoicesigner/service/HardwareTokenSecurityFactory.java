@@ -6,7 +6,7 @@ import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 
-public enum SunPKCS11SecurityFactory implements SecurityFactory {
+public enum HardwareTokenSecurityFactory implements SecurityFactory {
   INSTANCE;
 
   private static final String PROVIDER_NAME = "SunPKCS11";
@@ -20,7 +20,7 @@ public enum SunPKCS11SecurityFactory implements SecurityFactory {
 
   private Provider provider;
 
-  private SunPKCS11SecurityFactory() {
+  private HardwareTokenSecurityFactory() {
     provider = Security.getProvider(PROVIDER_NAME);
     addSecurityProvider();
   }
