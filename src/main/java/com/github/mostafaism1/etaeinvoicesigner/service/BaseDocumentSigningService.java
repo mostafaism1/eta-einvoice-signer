@@ -18,11 +18,11 @@ public abstract class BaseDocumentSigningService
   public String generateSignedDocuments(String documents)
     throws InvalidDocumentFormatException {
     final String DOCUMENTS_KEY = "documents";
-    JsonArray documentsArray = gson
+    JsonArray unsignedDocuments = gson
       .fromJson(documents, JsonObject.class)
       .get(DOCUMENTS_KEY)
       .getAsJsonArray();
-    JsonArray signedDocuments = signDocuments(documentsArray);
+    JsonArray signedDocuments = signDocuments(unsignedDocuments);
     JsonObject result = new JsonObject();
     result.add(DOCUMENTS_KEY, signedDocuments);
     return result.toString();
@@ -46,7 +46,9 @@ public abstract class BaseDocumentSigningService
   private JsonArray signDocuments(JsonArray documentArray) {
     return StreamSupport
       .stream(documentArray.spliterator(), true)
-      .map(document -> generateSignedDocument(document.toString()))
+      .map(
+        unsignedDocument -> generateSignedDocument(unsignedDocument.toString())
+      )
       .map(signedDocument -> gson.fromJson(signedDocument, JsonObject.class))
       .collect(JsonObjectCollector.toJsonObjectCollector());
   }
