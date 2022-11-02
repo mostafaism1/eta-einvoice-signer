@@ -43,9 +43,9 @@ public abstract class BaseDocumentSigningService
 
   protected abstract DocumentSigningFactory getDocumentSigningFactory();
 
-  private JsonArray signDocuments(JsonArray documentArray) {
+  private JsonArray signDocuments(JsonArray unsignedDocuments) {
     return StreamSupport
-      .stream(documentArray.spliterator(), true)
+      .stream(unsignedDocuments.spliterator(), true)
       .map(
         unsignedDocument -> generateSignedDocument(unsignedDocument.toString())
       )
