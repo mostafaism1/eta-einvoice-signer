@@ -10,12 +10,12 @@ import java.security.Security;
 import java.security.cert.X509Certificate;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-public class BouncyCastleSecurityFactory implements SecurityFactory {
+public class FileSecurityFactory implements SecurityFactory {
   private static final String BASE_CERT_PATH = "src/main/resources/certs/";
 
   private Provider provider;
 
-  public BouncyCastleSecurityFactory() {
+  public FileSecurityFactory() {
     provider = new BouncyCastleProvider();
     addSecurityProvider();
   }

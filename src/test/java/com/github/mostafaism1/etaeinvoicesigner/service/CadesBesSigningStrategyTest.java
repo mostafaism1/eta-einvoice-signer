@@ -69,7 +69,7 @@ public class CadesBesSigningStrategyTest {
 
   @BeforeEach
   public void setup() {
-    securityFactory = new BouncyCastleSecurityFactory();
+    securityFactory = new FileSecurityFactory();
     signingStrategy = new CadesBesSigningStrategy(securityFactory);
     input = "input";
     base64SignedInput = signingStrategy.sign(input);
