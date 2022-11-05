@@ -19,6 +19,8 @@ import java.text.ParseException;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import javax.crypto.BadPaddingException;
@@ -69,7 +71,7 @@ public class CadesBesSigningStrategyTest {
 
   @BeforeEach
   public void setup() {
-    securityFactory = new FileSecurityFactory();
+    securityFactory = InMemorySecurityFactory.INSTANCE;
     signingStrategy = new CadesBesSigningStrategy(securityFactory);
     input = "input";
     base64SignedInput = signingStrategy.sign(input);
@@ -186,16 +188,22 @@ public class CadesBesSigningStrategyTest {
       .getCertificate()
       .getIssuerX500Principal()
       .getName();
+    Map<String, String> expectedIssuerNameRDNs = getIssuerNameRDNs(
+      expectedIssuerName
+    );
     BigInteger expectedSerialNumber = securityFactory
       .getCertificate()
       .getSerialNumber();
 
     // When.
     String actualIssuerName = signerInfo.getSID().getIssuer().toString();
+    Map<String, String> actualIssuerNameRDNs = getIssuerNameRDNs(
+      actualIssuerName
+    );
     BigInteger actualSerialNumber = signerInfo.getSID().getSerialNumber();
 
     // Then.
-    then(actualIssuerName).isEqualTo(expectedIssuerName);
+    then(actualIssuerNameRDNs).isEqualTo(expectedIssuerNameRDNs);
     then(actualSerialNumber).isEqualTo(expectedSerialNumber);
   }
 
@@ -421,5 +429,16 @@ public class CadesBesSigningStrategyTest {
 
     // Then.
     then(unsignedAttributes).isNull();
+  }
+
+  private Map<String, String> getIssuerNameRDNs(String issuerName) {
+    Map<String, String> result = new HashMap<>();
+    String[] RDNs = issuerName.split(",");
+    for (String RDN : RDNs) {
+      String RDNKey = RDN.split("=")[0];
+      String RDNValue = RDN.split("=")[1];
+      result.put(RDNKey, RDNValue);
+    }
+    return result;
   }
 }
