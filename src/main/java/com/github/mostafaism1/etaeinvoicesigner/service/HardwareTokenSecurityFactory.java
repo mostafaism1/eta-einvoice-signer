@@ -12,22 +12,19 @@ public enum HardwareTokenSecurityFactory implements SecurityFactory {
   private static final String PROVIDER_NAME = "SunPKCS11";
   private static final String KEY_STORE_TYPE = "PKCS11";
 
-  private final String pkcs11ConfigFilePath =
-    "C:\\workspace\\eta-einvoice-signer\\pkcs11.cfg";
-  private final String keyStorePassword = "42131536";
-  private final String certificateAlias =
-    "0x04c8978a8578c3f05d028ea8d6dac515f4092da4";
-
+  private ConfigurationReader configurationReader;
   private Provider provider;
 
   private HardwareTokenSecurityFactory() {
     provider = Security.getProvider(PROVIDER_NAME);
     addSecurityProvider();
+    configurationReader = FileConfigurationReader.INSTANCE;
   }
 
   @Override
   public void addSecurityProvider() {
-    provider = provider.configure(pkcs11ConfigFilePath);
+    provider =
+      provider.configure(configurationReader.getPkcs11ConfigFilePath());
     Security.addProvider(provider);
   }
 
@@ -35,9 +32,12 @@ public enum HardwareTokenSecurityFactory implements SecurityFactory {
   public PrivateKey getPrivateKey() {
     try {
       KeyStore keyStore = KeyStore.getInstance(KEY_STORE_TYPE);
-      keyStore.load(null, keyStorePassword.toCharArray());
+      keyStore.load(
+        null,
+        configurationReader.getKeyStorePassword().toCharArray()
+      );
       PrivateKey privateKey = (PrivateKey) keyStore.getKey(
-        certificateAlias,
+        configurationReader.getCertificateAlias(),
         null
       );
       return privateKey;
@@ -51,9 +51,12 @@ public enum HardwareTokenSecurityFactory implements SecurityFactory {
   public X509Certificate getCertificate() {
     try {
       KeyStore keyStore = KeyStore.getInstance(KEY_STORE_TYPE);
-      keyStore.load(null, keyStorePassword.toCharArray());
+      keyStore.load(
+        null,
+        configurationReader.getKeyStorePassword().toCharArray()
+      );
       X509Certificate x509Certificate = (X509Certificate) keyStore.getCertificate(
-        certificateAlias
+        configurationReader.getCertificateAlias()
       );
       return x509Certificate;
     } catch (Exception e) {

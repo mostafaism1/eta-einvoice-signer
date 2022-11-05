@@ -11,11 +11,11 @@ import java.security.cert.X509Certificate;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class FileSecurityFactory implements SecurityFactory {
-  private static final String BASE_CERT_PATH = "src/main/resources/certs/";
-
+  private ConfigurationReader configurationReader;
   private Provider provider;
 
   public FileSecurityFactory() {
+    configurationReader = FileConfigurationReader.INSTANCE;
     provider = new BouncyCastleProvider();
     addSecurityProvider();
   }
@@ -29,13 +29,18 @@ public class FileSecurityFactory implements SecurityFactory {
   public PrivateKey getPrivateKey() {
     try {
       InputStream inputStream = Files.newInputStream(
-        Path.of(BASE_CERT_PATH, "signer-key-store.p12")
+        Path.of(configurationReader.getKeyStorePath())
       );
-      KeyStore keyStore = KeyStore.getInstance("PKCS12");
-      keyStore.load(inputStream, "password".toCharArray());
+      KeyStore keyStore = KeyStore.getInstance(
+        configurationReader.getKeyStoreType()
+      );
+      keyStore.load(
+        inputStream,
+        configurationReader.getKeyStorePassword().toCharArray()
+      );
       PrivateKey privateKey = (PrivateKey) keyStore.getKey(
-        "signer-cert-alias",
-        "password".toCharArray()
+        configurationReader.getCertificateAlias(),
+        configurationReader.getKeyStorePassword().toCharArray()
       );
       return privateKey;
     } catch (Exception e) {
@@ -48,12 +53,17 @@ public class FileSecurityFactory implements SecurityFactory {
   public X509Certificate getCertificate() {
     try {
       InputStream inputStream = Files.newInputStream(
-        Path.of(BASE_CERT_PATH, "signer-key-store.p12")
+        Path.of(configurationReader.getKeyStorePath())
       );
-      KeyStore keyStore = KeyStore.getInstance("PKCS12");
-      keyStore.load(inputStream, "password".toCharArray());
+      KeyStore keyStore = KeyStore.getInstance(
+        configurationReader.getKeyStoreType()
+      );
+      keyStore.load(
+        inputStream,
+        configurationReader.getKeyStorePassword().toCharArray()
+      );
       X509Certificate x509Certificate = (X509Certificate) keyStore.getCertificate(
-        "signer-cert-alias"
+        configurationReader.getCertificateAlias()
       );
       return x509Certificate;
     } catch (Exception e) {
