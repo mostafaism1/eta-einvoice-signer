@@ -71,7 +71,7 @@ public class CadesBesSigningStrategyTest {
 
   @BeforeEach
   public void setup() {
-    securityFactory = new FileSecurityFactory();
+    securityFactory = InMemorySecurityFactory.INSTANCE;
     signingStrategy = new CadesBesSigningStrategy(securityFactory);
     input = "input";
     base64SignedInput = signingStrategy.sign(input);
