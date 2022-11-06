@@ -10,11 +10,13 @@ import java.security.Security;
 import java.security.cert.X509Certificate;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-public class FileSecurityFactory implements SecurityFactory {
+public enum FileSecurityFactory implements SecurityFactory {
+  INSTANCE;
+
   private ConfigurationReader configurationReader;
   private Provider provider;
 
-  public FileSecurityFactory() {
+  private FileSecurityFactory() {
     configurationReader = FileConfigurationReader.INSTANCE;
     provider = new BouncyCastleProvider();
     addSecurityProvider();
