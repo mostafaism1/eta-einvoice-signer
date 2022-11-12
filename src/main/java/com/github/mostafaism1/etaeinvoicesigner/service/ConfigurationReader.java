@@ -10,4 +10,6 @@ public interface ConfigurationReader {
   public String getKeyStorePassword();
 
   public String getCertificateAlias();
+
+  public String getCertificateIssuerName();
 }

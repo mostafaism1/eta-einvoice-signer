@@ -40,6 +40,11 @@ public enum FileConfigurationReader implements ConfigurationReader {
     return properties.getProperty("keystore.certificateAlias");
   }
 
+  @Override
+  public String getCertificateIssuerName() {
+    return properties.getProperty("keystore.certificateIssuerName");
+  }
+
   private void tryReadingConfiguration() {
     boolean defaultConfigReadSuccessfully = true;
     try {
