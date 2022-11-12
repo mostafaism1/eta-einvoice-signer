@@ -3,7 +3,7 @@ openssl genrsa 2048 > ca-key.pem \
 && \
 openssl req -new -x509 -nodes \
     -days 365000 \
-    -subj '/CN=Test CA' \
+    -subj '/CN=Egypt Trust Sealing CA' \
     -key ca-key.pem \
     -out ca-cert.pem \
 && \
