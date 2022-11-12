@@ -23,9 +23,9 @@ public enum HardwareTokenSecurityFactory implements SecurityFactory {
   private String alias;
 
   private HardwareTokenSecurityFactory() {
+    configurationReader = FileConfigurationReader.INSTANCE;
     provider = Security.getProvider(PROVIDER_NAME);
     addSecurityProvider();
-    configurationReader = FileConfigurationReader.INSTANCE;
     initializeKeystore();
     alias = getAliasByCertificateIssuerName();
   }
