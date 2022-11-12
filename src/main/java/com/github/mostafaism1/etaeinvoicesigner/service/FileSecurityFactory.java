@@ -19,6 +19,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 public enum FileSecurityFactory implements SecurityFactory {
   INSTANCE;
 
+  private static final String KEY_STORE_TYPE = "PKCS12";
   private ConfigurationReader configurationReader;
   private Provider provider;
   private KeyStore keyStore;
@@ -75,7 +76,7 @@ public enum FileSecurityFactory implements SecurityFactory {
         Path.of(configurationReader.getKeyStorePath())
       )
     ) {
-      keyStore = KeyStore.getInstance(configurationReader.getKeyStoreType());
+      keyStore = KeyStore.getInstance(KEY_STORE_TYPE);
       keyStore.load(
         inputStream,
         configurationReader.getKeyStorePassword().toCharArray()
