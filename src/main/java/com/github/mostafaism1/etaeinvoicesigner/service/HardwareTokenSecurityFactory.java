@@ -91,9 +91,7 @@ public enum HardwareTokenSecurityFactory implements SecurityFactory {
         X509Certificate certificate = (X509Certificate) keyStore.getCertificate(
           alias
         );
-        String issuerName = certificate
-          .getIssuerX500Principal()
-          .getName(targetIssuerName);
+        String issuerName = certificate.getIssuerX500Principal().getName();
         if (issuerName.contains(targetIssuerName)) {
           return alias;
         }
