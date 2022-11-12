@@ -44,7 +44,7 @@ public enum FileConfigurationReader implements ConfigurationReader {
     boolean defaultConfigReadSuccessfully = true;
     try {
       tryReadingDefaultConfiguration();
-    } catch (IOException e1) {
+    } catch (Exception e1) {
       defaultConfigReadSuccessfully = false;
     }
     try {
