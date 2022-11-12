@@ -5,9 +5,7 @@ public interface ConfigurationReader {
 
   public String getKeyStorePath();
 
-  public String getKeyStoreType();
-
   public String getKeyStorePassword();
 
-  public String getCertificateAlias();
+  public String getCertificateIssuerName();
 }

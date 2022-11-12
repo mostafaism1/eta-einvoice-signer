@@ -26,18 +26,13 @@ public enum FileConfigurationReader implements ConfigurationReader {
   }
 
   @Override
-  public String getKeyStoreType() {
-    return properties.getProperty("keystore.keyStoreType");
-  }
-
-  @Override
   public String getKeyStorePassword() {
     return properties.getProperty("keystore.keyStorePassword");
   }
 
   @Override
-  public String getCertificateAlias() {
-    return properties.getProperty("keystore.certificateAlias");
+  public String getCertificateIssuerName() {
+    return properties.getProperty("keystore.certificateIssuerName");
   }
 
   private void tryReadingConfiguration() {
