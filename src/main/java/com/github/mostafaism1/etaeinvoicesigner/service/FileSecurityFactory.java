@@ -13,7 +13,6 @@ import java.security.Security;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Enumeration;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public enum FileSecurityFactory implements SecurityFactory {
@@ -30,7 +29,11 @@ public enum FileSecurityFactory implements SecurityFactory {
     provider = new BouncyCastleProvider();
     addSecurityProvider();
     initializeKeystore();
-    alias = getAliasByCertificateIssuerName();
+    alias =
+      SecurityUtils.getAliasByCertificateIssuerName(
+        keyStore,
+        configurationReader.getCertificateIssuerName()
+      );
   }
 
   @Override
@@ -87,27 +90,6 @@ public enum FileSecurityFactory implements SecurityFactory {
       | CertificateException
       | IOException e
     ) {
-      throw new RuntimeException();
-    }
-  }
-
-  private String getAliasByCertificateIssuerName() {
-    try {
-      String targetIssuerName = configurationReader.getCertificateIssuerName();
-      Enumeration<String> aliases;
-      aliases = keyStore.aliases();
-      while (aliases.hasMoreElements()) {
-        String alias = aliases.nextElement();
-        X509Certificate certificate = (X509Certificate) keyStore.getCertificate(
-          alias
-        );
-        String issuerName = certificate.getIssuerX500Principal().getName();
-        if (issuerName.contains(targetIssuerName)) {
-          return alias;
-        }
-      }
-      throw new RuntimeException();
-    } catch (KeyStoreException e) {
       throw new RuntimeException();
     }
   }

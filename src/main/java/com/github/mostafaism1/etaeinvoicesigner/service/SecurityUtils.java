@@ -5,9 +5,12 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.Enumeration;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -89,5 +92,28 @@ public class SecurityUtils {
       .setProvider("BC")
       .build(keyPair.getPrivate());
     return certBldr.build(signer);
+  }
+
+  public static String getAliasByCertificateIssuerName(
+    KeyStore keyStore,
+    String targetIssuerName
+  ) {
+    try {
+      Enumeration<String> aliases;
+      aliases = keyStore.aliases();
+      while (aliases.hasMoreElements()) {
+        String alias = aliases.nextElement();
+        X509Certificate certificate = (X509Certificate) keyStore.getCertificate(
+          alias
+        );
+        String issuerName = certificate.getIssuerX500Principal().getName();
+        if (issuerName.contains(targetIssuerName)) {
+          return alias;
+        }
+      }
+      throw new RuntimeException();
+    } catch (KeyStoreException e) {
+      throw new RuntimeException();
+    }
   }
 }
