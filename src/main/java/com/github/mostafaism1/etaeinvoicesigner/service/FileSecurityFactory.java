@@ -100,11 +100,8 @@ public enum FileSecurityFactory implements SecurityFactory {
         X509Certificate certificate = (X509Certificate) keyStore.getCertificate(
           alias
         );
-        String issuerName = certificate
-          .getIssuerX500Principal()
-          .getName()
-          .split("=")[1];
-        if (issuerName.equals(targetIssuerName)) {
+        String issuerName = certificate.getIssuerX500Principal().getName();
+        if (issuerName.contains(targetIssuerName)) {
           return alias;
         }
       }
