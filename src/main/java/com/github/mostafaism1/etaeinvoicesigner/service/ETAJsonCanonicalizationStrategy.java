@@ -23,23 +23,8 @@ public class ETAJsonCanonicalizationStrategy
    */
   @Override
   public String canonicalize(String document) {
-    if (!isValid(document)) {
-      throw new InvalidDocumentFormatException();
-    }
-    Gson gson = new Gson();
-    JsonElement jsonElement = gson.fromJson(document, JsonElement.class);
-    return dispatchToCanonicalize(jsonElement);
-  }
-
-  private boolean isValid(String json) {
-    TypeAdapter<JsonElement> strictAdapter = new Gson()
-    .getAdapter(JsonElement.class);
-    try {
-      strictAdapter.fromJson(json);
-    } catch (JsonSyntaxException | IOException e) {
-      return false;
-    }
-    return true;
+    JsonElement documentAsJson = convertToJson(document);
+    return dispatchToCanonicalize(documentAsJson);
   }
 
   private JsonElement convertToJson(String json) {
