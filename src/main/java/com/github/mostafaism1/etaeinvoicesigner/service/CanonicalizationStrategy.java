@@ -9,5 +9,5 @@ public interface CanonicalizationStrategy {
    * @return the document in the canonical format
    * @throws InvalidDocumentFormatException if the document's format is invalid
    */
-  String canonicalize(String document) throws InvalidDocumentFormatException;
+  String canonicalize(String document);
 }

@@ -60,15 +60,8 @@ public class CadesBesSigningStrategy implements SigningStrategy {
       signedData =
         buildCMSSignedData(data.getBytes(StandardCharsets.UTF_8), false);
       return Base64.getEncoder().encodeToString(signedData.getEncoded());
-    } catch (
-      CertificateEncodingException
-      | OperatorCreationException
-      | NoSuchAlgorithmException
-      | CMSException
-      | IOException e
-    ) {
-      e.printStackTrace();
-      return null;
+    } catch (Exception e) {
+      throw new SignatureException(e);
     }
   }
 
@@ -162,5 +155,12 @@ public class CadesBesSigningStrategy implements SigningStrategy {
     );
     DERSet attributeValue = new DERSet(signingCertificateV2);
     return new Attribute(attributeIdentifier, attributeValue);
+  }
+
+  private static class SignatureException extends RuntimeException {
+
+    public SignatureException(Exception e) {
+      super(e);
+    }
   }
 }

@@ -17,8 +17,7 @@ public abstract class BaseDocumentSigningService
   }
 
   @Override
-  public String generateSignedDocuments(String documents)
-    throws InvalidDocumentFormatException {
+  public String generateSignedDocuments(String documents) {
     JsonArray unsignedDocuments = extractUnsignedDocuments(documents);
     JsonArray signedDocuments = signDocuments(unsignedDocuments);
     JsonObject result = wrapSignedDocuments(signedDocuments);

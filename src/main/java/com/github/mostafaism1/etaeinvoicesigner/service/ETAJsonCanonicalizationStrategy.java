@@ -22,25 +22,19 @@ public class ETAJsonCanonicalizationStrategy
    * page</a> for the specification of the canonical format.
    */
   @Override
-  public String canonicalize(String document)
-    throws InvalidDocumentFormatException {
-    if (!isValid(document)) {
-      throw new InvalidDocumentFormatException(document);
-    }
-    Gson gson = new Gson();
-    JsonElement jsonElement = gson.fromJson(document, JsonElement.class);
-    return dispatchToCanonicalize(jsonElement);
+  public String canonicalize(String document) {
+    JsonElement documentAsJson = convertToJson(document);
+    return dispatchToCanonicalize(documentAsJson);
   }
 
-  private boolean isValid(String json) {
+  private JsonElement convertToJson(String json) {
     TypeAdapter<JsonElement> strictAdapter = new Gson()
     .getAdapter(JsonElement.class);
     try {
-      strictAdapter.fromJson(json);
+      return strictAdapter.fromJson(json);
     } catch (JsonSyntaxException | IOException e) {
-      return false;
+      throw new InvalidDocumentFormatException(e);
     }
-    return true;
   }
 
   private String dispatchToCanonicalize(JsonElement jsonElement) {
