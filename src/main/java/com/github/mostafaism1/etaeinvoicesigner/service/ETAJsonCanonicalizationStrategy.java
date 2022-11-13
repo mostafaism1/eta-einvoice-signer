@@ -42,6 +42,16 @@ public class ETAJsonCanonicalizationStrategy
     return true;
   }
 
+  private JsonElement convertToJson(String json) {
+    TypeAdapter<JsonElement> strictAdapter = new Gson()
+    .getAdapter(JsonElement.class);
+    try {
+      return strictAdapter.fromJson(json);
+    } catch (JsonSyntaxException | IOException e) {
+      throw new InvalidDocumentFormatException(e);
+    }
+  }
+
   private String dispatchToCanonicalize(JsonElement jsonElement) {
     return dispatchToCanonicalize(jsonElement, "");
   }
