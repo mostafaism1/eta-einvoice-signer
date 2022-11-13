@@ -28,5 +28,5 @@ openssl pkcs12 -export \
     -chain \
     -caname ca-cert-alias \
     -CAfile ca-cert.pem \
-    -passout pass:password \
+    -passout pass:42131536 \
     -out signer-key-store.p12
