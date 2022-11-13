@@ -61,8 +61,7 @@ public class CadesBesSigningStrategy implements SigningStrategy {
         buildCMSSignedData(data.getBytes(StandardCharsets.UTF_8), false);
       return Base64.getEncoder().encodeToString(signedData.getEncoded());
     } catch (Exception e) {
-      e.printStackTrace();
-      return null;
+      throw new SignatureException(e);
     }
   }
 
