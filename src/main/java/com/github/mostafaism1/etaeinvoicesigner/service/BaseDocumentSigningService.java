@@ -7,6 +7,7 @@ import java.util.stream.StreamSupport;
 
 public abstract class BaseDocumentSigningService
   implements DocumentSigningService {
+  private final String DOCUMENTS_ARRAY_KEY = "documents";
   private DocumentSigningFactory documentSigningFactory;
   private Gson gson;
 
@@ -18,14 +19,9 @@ public abstract class BaseDocumentSigningService
   @Override
   public String generateSignedDocuments(String documents)
     throws InvalidDocumentFormatException {
-    final String DOCUMENTS_KEY = "documents";
-    JsonArray unsignedDocuments = gson
-      .fromJson(documents, JsonObject.class)
-      .get(DOCUMENTS_KEY)
-      .getAsJsonArray();
+    JsonArray unsignedDocuments = extractUnsignedDocuments(documents);
     JsonArray signedDocuments = signDocuments(unsignedDocuments);
-    JsonObject result = new JsonObject();
-    result.add(DOCUMENTS_KEY, signedDocuments);
+    JsonObject result = wrapSignedDocuments(signedDocuments);
     return result.toString();
   }
 
@@ -43,6 +39,20 @@ public abstract class BaseDocumentSigningService
   }
 
   protected abstract DocumentSigningFactory getDocumentSigningFactory();
+
+  private JsonArray extractUnsignedDocuments(String documents) {
+    JsonArray unsignedDocuments = gson
+      .fromJson(documents, JsonObject.class)
+      .get(DOCUMENTS_ARRAY_KEY)
+      .getAsJsonArray();
+    return unsignedDocuments;
+  }
+
+  private JsonObject wrapSignedDocuments(JsonArray signedDocuments) {
+    JsonObject result = new JsonObject();
+    result.add(DOCUMENTS_ARRAY_KEY, signedDocuments);
+    return result;
+  }
 
   private JsonArray signDocuments(JsonArray unsignedDocuments) {
     return StreamSupport
