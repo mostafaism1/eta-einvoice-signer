@@ -1,7 +1,6 @@
 package com.github.mostafaism1.etaeinvoicesigner.service;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -69,8 +68,7 @@ public enum FileConfigurationReader implements ConfigurationReader {
     );
   }
 
-  private void tryReadingUserConfiguration()
-    throws FileNotFoundException, IOException {
+  private void tryReadingUserConfiguration() throws IOException {
     properties = new Properties(defaultProperties);
     String configFilePath = System.getProperty("configFilePath");
     properties.load(new FileInputStream(configFilePath));
