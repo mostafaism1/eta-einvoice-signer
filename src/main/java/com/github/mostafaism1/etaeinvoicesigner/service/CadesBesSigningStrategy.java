@@ -163,4 +163,11 @@ public class CadesBesSigningStrategy implements SigningStrategy {
     DERSet attributeValue = new DERSet(signingCertificateV2);
     return new Attribute(attributeIdentifier, attributeValue);
   }
+
+  private static class SignatureException extends RuntimeException {
+
+    public SignatureException(Exception e) {
+      super(e);
+    }
+  }
 }
