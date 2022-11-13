@@ -46,7 +46,7 @@ public enum HardwareTokenSecurityFactory implements SecurityFactory {
       PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, null);
       return privateKey;
     } catch (Exception e) {
-      throw new RuntimeException();
+      throw new RuntimeException(e);
     }
   }
 
@@ -58,7 +58,7 @@ public enum HardwareTokenSecurityFactory implements SecurityFactory {
       );
       return x509Certificate;
     } catch (Exception e) {
-      throw new RuntimeException();
+      throw new RuntimeException(e);
     }
   }
 
@@ -80,7 +80,7 @@ public enum HardwareTokenSecurityFactory implements SecurityFactory {
       | CertificateException
       | IOException e
     ) {
-      throw new RuntimeException();
+      throw new RuntimeException(e);
     }
   }
 }

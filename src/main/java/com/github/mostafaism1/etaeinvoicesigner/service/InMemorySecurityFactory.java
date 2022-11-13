@@ -58,7 +58,7 @@ public enum InMemorySecurityFactory implements SecurityFactory {
       );
       return keyGen.generateKeyPair();
     } catch (NoSuchAlgorithmException e) {
-      throw new RuntimeException();
+      throw new RuntimeException(e);
     }
   }
 
@@ -73,7 +73,7 @@ public enum InMemorySecurityFactory implements SecurityFactory {
     } catch (
       OperatorCreationException | GeneralSecurityException | IOException e
     ) {
-      throw new RuntimeException();
+      throw new RuntimeException(e);
     }
   }
 }

@@ -52,7 +52,7 @@ public enum FileSecurityFactory implements SecurityFactory {
     } catch (
       UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException e
     ) {
-      throw new RuntimeException();
+      throw new RuntimeException(e);
     }
   }
 
@@ -64,7 +64,7 @@ public enum FileSecurityFactory implements SecurityFactory {
       );
       return x509Certificate;
     } catch (Exception e) {
-      throw new RuntimeException();
+      throw new RuntimeException(e);
     }
   }
 
@@ -90,7 +90,7 @@ public enum FileSecurityFactory implements SecurityFactory {
       | CertificateException
       | IOException e
     ) {
-      throw new RuntimeException();
+      throw new RuntimeException(e);
     }
   }
 }

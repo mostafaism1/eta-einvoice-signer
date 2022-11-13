@@ -113,7 +113,7 @@ public class SecurityUtils {
       }
       throw new RuntimeException();
     } catch (KeyStoreException e) {
-      throw new RuntimeException();
+      throw new RuntimeException(e);
     }
   }
 }
