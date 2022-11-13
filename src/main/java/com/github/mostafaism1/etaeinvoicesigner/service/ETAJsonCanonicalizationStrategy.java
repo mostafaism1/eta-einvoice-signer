@@ -24,7 +24,7 @@ public class ETAJsonCanonicalizationStrategy
   @Override
   public String canonicalize(String document) {
     if (!isValid(document)) {
-      throw new InvalidDocumentFormatException(document);
+      throw new InvalidDocumentFormatException();
     }
     Gson gson = new Gson();
     JsonElement jsonElement = gson.fromJson(document, JsonElement.class);
