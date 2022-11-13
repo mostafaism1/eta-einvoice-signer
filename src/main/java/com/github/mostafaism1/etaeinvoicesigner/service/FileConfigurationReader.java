@@ -75,4 +75,11 @@ public enum FileConfigurationReader implements ConfigurationReader {
     String configFilePath = System.getProperty("configFilePath");
     properties.load(new FileInputStream(configFilePath));
   }
+
+  private static class NoConfigurationFoundException extends RuntimeException {
+
+    public NoConfigurationFoundException() {
+      super();
+    }
+  }
 }
