@@ -8,4 +8,8 @@ public interface ConfigurationReader {
   public String getKeyStorePassword();
 
   public String getCertificateIssuerName();
+
+  public String getUserName();
+
+  public String getEncryptedPassword();
 }
