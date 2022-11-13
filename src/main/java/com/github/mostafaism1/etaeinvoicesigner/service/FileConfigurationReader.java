@@ -48,12 +48,12 @@ public enum FileConfigurationReader implements ConfigurationReader {
     boolean defaultConfigReadSuccessfully = true;
     try {
       tryReadingDefaultConfiguration();
-    } catch (Exception e1) {
+    } catch (Exception e) {
       defaultConfigReadSuccessfully = false;
     }
     try {
       tryReadingUserConfiguration();
-    } catch (Exception e1) {
+    } catch (Exception e) {
       if (!defaultConfigReadSuccessfully) {
         throw new NoConfigurationFoundException();
       }
