@@ -6,10 +6,9 @@ public interface DocumentSigningService {
    *
    * @param documents a collection of documents
    * @return the collection of signed documents
-   * @throws InvalidDocumentFormatException if the documents's format is invalid
+   * @throws InvalidDocumentFormatException if the documents' format is invalid
    */
-  String generateSignedDocuments(String documents)
-    throws InvalidDocumentFormatException;
+  String generateSignedDocuments(String documents);
 
   /**
    * Generates a signed document.
@@ -18,6 +17,5 @@ public interface DocumentSigningService {
    * @return the signed document
    * @throws InvalidDocumentFormatException if the document's format is invalid
    */
-  String generateSignedDocument(String document)
-    throws InvalidDocumentFormatException;
+  String generateSignedDocument(String document);
 }

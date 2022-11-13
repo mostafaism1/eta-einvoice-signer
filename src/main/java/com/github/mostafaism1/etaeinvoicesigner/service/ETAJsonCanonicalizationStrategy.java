@@ -22,8 +22,7 @@ public class ETAJsonCanonicalizationStrategy
    * page</a> for the specification of the canonical format.
    */
   @Override
-  public String canonicalize(String document)
-    throws InvalidDocumentFormatException {
+  public String canonicalize(String document) {
     if (!isValid(document)) {
       throw new InvalidDocumentFormatException(document);
     }
