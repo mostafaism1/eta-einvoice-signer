@@ -56,7 +56,7 @@ public enum FileConfigurationReader implements ConfigurationReader {
       tryReadingUserConfiguration();
     } catch (Exception e1) {
       if (!defaultConfigReadSuccessfully) {
-        throw new RuntimeException();
+        throw new NoConfigurationFoundException();
       }
     }
   }
