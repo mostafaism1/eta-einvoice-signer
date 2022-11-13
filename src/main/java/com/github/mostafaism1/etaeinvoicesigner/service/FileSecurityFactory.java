@@ -1,17 +1,12 @@
 package com.github.mostafaism1.etaeinvoicesigner.service;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -49,9 +44,7 @@ public enum FileSecurityFactory implements SecurityFactory {
         configurationReader.getKeyStorePassword().toCharArray()
       );
       return privateKey;
-    } catch (
-      UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException e
-    ) {
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
@@ -84,12 +77,7 @@ public enum FileSecurityFactory implements SecurityFactory {
         inputStream,
         configurationReader.getKeyStorePassword().toCharArray()
       );
-    } catch (
-      KeyStoreException
-      | NoSuchAlgorithmException
-      | CertificateException
-      | IOException e
-    ) {
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }

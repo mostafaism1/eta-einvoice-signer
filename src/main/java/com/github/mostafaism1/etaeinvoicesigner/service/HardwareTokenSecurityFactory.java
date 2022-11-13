@@ -1,13 +1,9 @@
 package com.github.mostafaism1.etaeinvoicesigner.service;
 
-import java.io.IOException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 public enum HardwareTokenSecurityFactory implements SecurityFactory {
@@ -74,12 +70,7 @@ public enum HardwareTokenSecurityFactory implements SecurityFactory {
         null,
         configurationReader.getKeyStorePassword().toCharArray()
       );
-    } catch (
-      KeyStoreException
-      | NoSuchAlgorithmException
-      | CertificateException
-      | IOException e
-    ) {
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }

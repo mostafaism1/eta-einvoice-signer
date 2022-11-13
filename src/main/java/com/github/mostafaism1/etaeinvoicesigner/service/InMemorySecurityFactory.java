@@ -1,7 +1,5 @@
 package com.github.mostafaism1.etaeinvoicesigner.service;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -11,7 +9,6 @@ import java.security.Security;
 import java.security.cert.X509Certificate;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.operator.OperatorCreationException;
 
 public enum InMemorySecurityFactory implements SecurityFactory {
   INSTANCE;
@@ -70,9 +67,7 @@ public enum InMemorySecurityFactory implements SecurityFactory {
       );
       certificate = SecurityUtils.convertX509CertificateHolder(certHldr);
       return certificate;
-    } catch (
-      OperatorCreationException | GeneralSecurityException | IOException e
-    ) {
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
