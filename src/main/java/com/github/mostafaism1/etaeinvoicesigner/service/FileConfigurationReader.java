@@ -35,6 +35,16 @@ public enum FileConfigurationReader implements ConfigurationReader {
     return properties.getProperty("keystore.certificateIssuerName");
   }
 
+  @Override
+  public String getUserName() {
+    return properties.getProperty("user.userName");
+  }
+
+  @Override
+  public String getEncryptedPassword() {
+    return properties.getProperty("user.encryptedPassword");
+  }
+
   private void tryReadingConfiguration() {
     boolean defaultConfigReadSuccessfully = true;
     try {
