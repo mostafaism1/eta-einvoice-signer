@@ -8,10 +8,11 @@ import java.util.stream.StreamSupport;
 public abstract class BaseDocumentSigningService
   implements DocumentSigningService {
   private DocumentSigningFactory documentSigningFactory;
-  private Gson gson = new Gson();
+  private Gson gson;
 
   protected BaseDocumentSigningService() {
-    this.documentSigningFactory = getDocumentSigningFactory();
+    documentSigningFactory = getDocumentSigningFactory();
+    gson = new Gson();
   }
 
   @Override
