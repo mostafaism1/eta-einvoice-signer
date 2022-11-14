@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SignatureController {
   private DocumentSigningService documentSigningService;
 
-  @PostMapping("bulk")
+  @PostMapping
   public String signDocuments(@RequestBody String jsonDocuments) {
     return documentSigningService.generateSignedDocuments(jsonDocuments);
   }
