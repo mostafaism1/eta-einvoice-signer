@@ -1,6 +1,8 @@
 package com.github.mostafaism1.etaeinvoicesigner.service;
 
 public interface ConfigurationReader {
+  public String getSignatureKeystoreType();
+
   public String getPkcs11ConfigFilePath();
 
   public String getPkcs12KeyStoreFilePath();

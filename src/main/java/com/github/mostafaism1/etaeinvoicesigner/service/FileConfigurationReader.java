@@ -15,6 +15,11 @@ public enum FileConfigurationReader implements ConfigurationReader {
   }
 
   @Override
+  public String getSignatureKeystoreType() {
+    return properties.getProperty("signature.keystore.type");
+  }
+
+  @Override
   public String getPkcs11ConfigFilePath() {
     return properties.getProperty("signature.keystore.pkcs11ConfigFilePath");
   }
