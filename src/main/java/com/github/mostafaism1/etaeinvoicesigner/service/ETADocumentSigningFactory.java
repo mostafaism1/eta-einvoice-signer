@@ -1,6 +1,7 @@
 package com.github.mostafaism1.etaeinvoicesigner.service;
 
 public class ETADocumentSigningFactory implements DocumentSigningFactory {
+  ConfigurationReader configurationReader = FileConfigurationReader.INSTANCE;
 
   @Override
   public CanonicalizationStrategy getCanonicalizationStrategy() {
@@ -19,6 +20,23 @@ public class ETADocumentSigningFactory implements DocumentSigningFactory {
 
   @Override
   public SecurityFactory getSecurityFactory() {
-    return HardwareTokenSecurityFactory.INSTANCE;
+    String keyStoreType = configurationReader.getSignatureKeystoreType();
+    if (keyStoreType.equals("hardware")) {
+      return HardwareTokenSecurityFactory.INSTANCE;
+    } else if (keyStoreType.equals("file")) {
+      return FileSecurityFactory.INSTANCE;
+    } else {
+      throw new InvalidKeyStoreTypeException(keyStoreType);
+    }
+  }
+
+  private static class InvalidKeyStoreTypeException extends RuntimeException {
+
+    public InvalidKeyStoreTypeException(String keyStoreType) {
+      super(
+        keyStoreType +
+        " is an invalid value for configuration property \"signature.keystore.type\". Allowed values are hardware and file."
+      );
+    }
   }
 }
