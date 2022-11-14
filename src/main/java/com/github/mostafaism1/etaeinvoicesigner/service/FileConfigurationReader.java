@@ -16,32 +16,32 @@ public enum FileConfigurationReader implements ConfigurationReader {
 
   @Override
   public String getPkcs11ConfigFilePath() {
-    return properties.getProperty("keystore.pkcs11ConfigFilePath");
+    return properties.getProperty("signature.keystore.pkcs11ConfigFilePath");
   }
 
   @Override
-  public String getKeyStorePath() {
-    return properties.getProperty("keystore.keyStorePath");
+  public String getPkcs12KeyStoreFilePath() {
+    return properties.getProperty("signature.keystore.pkcs12KeyStoreFilePath");
   }
 
   @Override
   public String getKeyStorePassword() {
-    return properties.getProperty("keystore.keyStorePassword");
+    return properties.getProperty("signature.keystore.password");
   }
 
   @Override
   public String getCertificateIssuerName() {
-    return properties.getProperty("keystore.certificateIssuerName");
+    return properties.getProperty("signature.keystore.certificateIssuerName");
   }
 
   @Override
   public String getUserName() {
-    return properties.getProperty("user.userName");
+    return properties.getProperty("auth.user.userName");
   }
 
   @Override
   public String getEncryptedPassword() {
-    return properties.getProperty("user.encryptedPassword");
+    return properties.getProperty("auth.user.encryptedPassword");
   }
 
   private void tryReadingConfiguration() {

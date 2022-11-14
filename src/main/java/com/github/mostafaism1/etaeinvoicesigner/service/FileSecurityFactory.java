@@ -69,7 +69,7 @@ public enum FileSecurityFactory implements SecurityFactory {
   private void initializeKeystore() {
     try (
       InputStream inputStream = Files.newInputStream(
-        Path.of(configurationReader.getKeyStorePath())
+        Path.of(configurationReader.getPkcs12KeyStoreFilePath())
       )
     ) {
       keyStore = KeyStore.getInstance(KEY_STORE_TYPE);
