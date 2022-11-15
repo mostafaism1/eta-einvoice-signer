@@ -17,6 +17,9 @@
 
   ```console
   $git clone https://github.com/mostafaism1/eta-einvoice-signer
+  ```
+
+  ```console
   $cd eta-einvoice-signer
   ```
 
@@ -40,7 +43,7 @@
 
 - See `src/main/resources/application.properties` for all available configuration properties.
 - Create a [.properties](https://en.wikipedia.org/wiki/.properties) file containing all properties to override.
-- [Run](#running) the application with the `-DconfigFilePath` java system property and set it to the location of the file created in the previous step.
+- [Run](#running) the application with the `-DconfigFilePath` JVM argument and set it to the path of the configuration file created in the previous step.
 
 #### Server Port
 
@@ -58,8 +61,8 @@
 #### Signature Keystore
 
 - The application supports 2 types of keystores for signature creation:
-  1. Hardware token keystore
-  2. File-based keystore
+  - Hardware token keystore
+  - File-based keystore
 
 ##### Hardware Token Keystore
 
@@ -82,7 +85,7 @@
 - To configure the user's details:
   - Set `auth.user.userName` to the user name.
   - Set `auth.user.encryptedPassword` to the bcrypt hash of the password.
-    - There are many ways to generate a bcrypt hash. Here's [one](https://bcrypt.online/) such tool.
+    - There are many tools to generate a bcrypt hash. Here's [one](https://bcrypt.online/) such tool.
 
 ### Running
 
