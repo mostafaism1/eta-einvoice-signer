@@ -1,4 +1,6 @@
-package com.github.mostafaism1.etaeinvoicesigner.signature;
+package com.github.mostafaism1.etaeinvoicesigner.signature.canonicalization;
+
+import com.github.mostafaism1.etaeinvoicesigner.signature.InvalidDocumentFormatException;
 
 @FunctionalInterface
 public interface CanonicalizationStrategy {
