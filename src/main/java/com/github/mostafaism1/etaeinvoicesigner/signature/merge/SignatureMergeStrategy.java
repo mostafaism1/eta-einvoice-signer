@@ -1,4 +1,4 @@
-package com.github.mostafaism1.etaeinvoicesigner.signature;
+package com.github.mostafaism1.etaeinvoicesigner.signature.merge;
 
 @FunctionalInterface
 public interface SignatureMergeStrategy {

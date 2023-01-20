@@ -1,6 +1,7 @@
 package com.github.mostafaism1.etaeinvoicesigner.signature;
 
 import com.github.mostafaism1.etaeinvoicesigner.signature.canonicalization.CanonicalizationStrategy;
+import com.github.mostafaism1.etaeinvoicesigner.signature.merge.SignatureMergeStrategy;
 
 public interface DocumentSigningFactory {
   CanonicalizationStrategy getCanonicalizationStrategy();
