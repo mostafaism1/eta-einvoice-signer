@@ -1,4 +1,4 @@
-package com.github.mostafaism1.etaeinvoicesigner.service;
+package com.github.mostafaism1.etaeinvoicesigner.signature.merge;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;

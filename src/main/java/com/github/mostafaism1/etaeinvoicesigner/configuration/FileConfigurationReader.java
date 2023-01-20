@@ -1,4 +1,4 @@
-package com.github.mostafaism1.etaeinvoicesigner.service;
+package com.github.mostafaism1.etaeinvoicesigner.configuration;
 
 import java.io.FileInputStream;
 import java.io.IOException;

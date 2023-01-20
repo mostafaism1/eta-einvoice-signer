@@ -1,5 +1,7 @@
-package com.github.mostafaism1.etaeinvoicesigner.service;
+package com.github.mostafaism1.etaeinvoicesigner.signature.security;
 
+import com.github.mostafaism1.etaeinvoicesigner.configuration.ConfigurationReader;
+import com.github.mostafaism1.etaeinvoicesigner.configuration.FileConfigurationReader;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;

@@ -1,5 +1,6 @@
-package com.github.mostafaism1.etaeinvoicesigner.service;
+package com.github.mostafaism1.etaeinvoicesigner.signature.canonicalization;
 
+import com.github.mostafaism1.etaeinvoicesigner.signature.InvalidDocumentFormatException;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

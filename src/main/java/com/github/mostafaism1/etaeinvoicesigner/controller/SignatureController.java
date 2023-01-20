@@ -1,6 +1,6 @@
 package com.github.mostafaism1.etaeinvoicesigner.controller;
 
-import com.github.mostafaism1.etaeinvoicesigner.service.DocumentSigningService;
+import com.github.mostafaism1.etaeinvoicesigner.signature.DocumentSigningService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

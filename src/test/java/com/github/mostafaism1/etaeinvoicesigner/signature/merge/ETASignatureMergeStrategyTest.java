@@ -1,4 +1,4 @@
-package com.github.mostafaism1.etaeinvoicesigner.service;
+package com.github.mostafaism1.etaeinvoicesigner.signature.merge;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import org.junit.jupiter.api.Test;
