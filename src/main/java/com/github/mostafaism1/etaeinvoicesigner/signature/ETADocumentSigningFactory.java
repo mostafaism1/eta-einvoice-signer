@@ -1,4 +1,4 @@
-package com.github.mostafaism1.etaeinvoicesigner.service;
+package com.github.mostafaism1.etaeinvoicesigner.signature;
 
 import com.github.mostafaism1.etaeinvoicesigner.configuration.ConfigurationReader;
 import com.github.mostafaism1.etaeinvoicesigner.configuration.FileConfigurationReader;

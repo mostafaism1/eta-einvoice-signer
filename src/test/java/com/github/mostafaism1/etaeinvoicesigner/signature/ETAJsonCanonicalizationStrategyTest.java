@@ -1,4 +1,4 @@
-package com.github.mostafaism1.etaeinvoicesigner.service;
+package com.github.mostafaism1.etaeinvoicesigner.signature;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.json.JSONException;
