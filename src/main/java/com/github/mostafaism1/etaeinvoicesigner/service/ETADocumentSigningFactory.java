@@ -1,5 +1,8 @@
 package com.github.mostafaism1.etaeinvoicesigner.service;
 
+import com.github.mostafaism1.etaeinvoicesigner.configuration.ConfigurationReader;
+import com.github.mostafaism1.etaeinvoicesigner.configuration.FileConfigurationReader;
+
 public class ETADocumentSigningFactory implements DocumentSigningFactory {
   ConfigurationReader configurationReader = FileConfigurationReader.INSTANCE;
 
