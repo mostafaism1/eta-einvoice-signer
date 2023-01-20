@@ -6,6 +6,9 @@ import com.github.mostafaism1.etaeinvoicesigner.signature.canonicalization.Canon
 import com.github.mostafaism1.etaeinvoicesigner.signature.canonicalization.ETAJsonCanonicalizationStrategy;
 import com.github.mostafaism1.etaeinvoicesigner.signature.merge.ETASignatureMergeStrategy;
 import com.github.mostafaism1.etaeinvoicesigner.signature.merge.SignatureMergeStrategy;
+import com.github.mostafaism1.etaeinvoicesigner.signature.security.FileSecurityFactory;
+import com.github.mostafaism1.etaeinvoicesigner.signature.security.HardwareTokenSecurityFactory;
+import com.github.mostafaism1.etaeinvoicesigner.signature.security.SecurityFactory;
 
 public class ETADocumentSigningFactory implements DocumentSigningFactory {
   ConfigurationReader configurationReader = FileConfigurationReader.INSTANCE;

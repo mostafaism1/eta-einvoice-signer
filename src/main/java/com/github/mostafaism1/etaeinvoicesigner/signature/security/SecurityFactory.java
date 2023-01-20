@@ -1,4 +1,4 @@
-package com.github.mostafaism1.etaeinvoicesigner.signature;
+package com.github.mostafaism1.etaeinvoicesigner.signature.security;
 
 import java.security.PrivateKey;
 import java.security.Provider;

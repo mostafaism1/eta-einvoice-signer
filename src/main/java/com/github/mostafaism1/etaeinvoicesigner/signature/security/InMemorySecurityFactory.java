@@ -1,4 +1,4 @@
-package com.github.mostafaism1.etaeinvoicesigner.signature;
+package com.github.mostafaism1.etaeinvoicesigner.signature.security;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
