@@ -13,7 +13,7 @@
 	</parent>
 	<groupId>com.github.mostafaism1</groupId>
 	<artifactId>eta-einvoice-signer</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>war</packaging>
 	<name>eta-einvoice-signer</name>
 	<description
