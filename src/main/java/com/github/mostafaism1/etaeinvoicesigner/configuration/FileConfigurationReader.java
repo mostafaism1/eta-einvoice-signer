@@ -1,17 +1,17 @@
 package com.github.mostafaism1.etaeinvoicesigner.configuration;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public enum FileConfigurationReader implements ConfigurationReader {
   INSTANCE;
 
-  Properties defaultProperties;
-  Properties properties;
+  private static final String CONFIG_FILE_NAME = "application.properties";
+  private final Properties properties;
 
   private FileConfigurationReader() {
-    tryReadingConfiguration();
+    properties = tryReadConfiguration();
   }
 
   @Override
@@ -49,34 +49,20 @@ public enum FileConfigurationReader implements ConfigurationReader {
     return properties.getProperty("auth.user.encryptedPassword");
   }
 
-  private void tryReadingConfiguration() {
-    boolean defaultConfigReadSuccessfully = true;
+  private Properties tryReadConfiguration() {
     try {
-      tryReadingDefaultConfiguration();
-    } catch (Exception e) {
-      defaultConfigReadSuccessfully = false;
-    }
-    try {
-      tryReadingUserConfiguration();
-    } catch (Exception e) {
-      if (!defaultConfigReadSuccessfully) {
-        throw new NoConfigurationFoundException();
-      }
+      return readConfiguration();
+    } catch (IOException e) {
+      throw new NoConfigurationFoundException();
     }
   }
 
-  private void tryReadingDefaultConfiguration() throws IOException {
-    defaultProperties = new Properties();
-    defaultProperties.load(
-      FileConfigurationReader.class.getClassLoader()
-        .getResourceAsStream("application.properties")
-    );
-  }
-
-  private void tryReadingUserConfiguration() throws IOException {
-    properties = new Properties(defaultProperties);
-    String configFilePath = System.getProperty("configFilePath");
-    properties.load(new FileInputStream(configFilePath));
+  private Properties readConfiguration() throws IOException {
+    Properties properties = new Properties();
+    InputStream propertiesResource =
+        FileConfigurationReader.class.getClassLoader().getResourceAsStream(CONFIG_FILE_NAME);
+    properties.load(propertiesResource);
+    return properties;
   }
 
   private static class NoConfigurationFoundException extends RuntimeException {
