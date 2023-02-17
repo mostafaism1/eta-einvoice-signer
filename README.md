@@ -2,7 +2,7 @@
 
 ## Description
 
-- A web application for signing documents in accordance with the [algorithm](https://sdk.invoicing.eta.gov.eg/signature-creation) described by the Egyptian Tax Authority (ETA).
+- A web application for signing e-invoice documents in accordance with the [algorithm](https://sdk.invoicing.eta.gov.eg/signature-creation) specified by the Egyptian Tax Authority (ETA).
 
 ## Installation
 
@@ -16,47 +16,24 @@
 - Clone the repository to your local environment:
 
   ```console
-  $git clone https://github.com/mostafaism1/eta-einvoice-signer
+  git clone https://github.com/mostafaism1/eta-einvoice-signer
   ```
 
   ```console
-  $cd eta-einvoice-signer
+  cd eta-einvoice-signer
   ```
 
 - Build the project:
 
-  - Linux/MacOS:
+  ```console
+  ./mvnw clean package
+  ```
 
-    ```console
-    $./mvnw clean package
-    ```
-
-  - Windows:
-
-    ```console
-    $.\mvnw.cmd clean package
-    ```
-
-- The previous step should output a .jar file in the target directory.
+- The previous step will output the following artifact in the target directory: `eta-einvoice-signer`
 
 ### Configuration
 
-- See `src/main/resources/application.properties` for all available configuration properties.
-- Create a [.properties](https://en.wikipedia.org/wiki/.properties) file containing all properties to override.
-- [Run](#running) the application with the `-DconfigFilePath` JVM argument and set it to the path of the configuration file created in the previous step.
-
-#### Server Port
-
-- Set `server.port` to the desired port.
-
-#### SSL
-
-- To enable SSL, set `server.ssl.enabled` to `true` and set the following properties:
-
-  - `server.ssl.key-store-type`
-  - `server.ssl.key-store`
-  - `server.ssl.key-store-password`
-  - `server.ssl.key-alias`
+- Configuration properties should be placed in the `application.properties` file at `eta-einvoice-signer/WEB-INF/classes` (see below for all available configuration properties.)
 
 #### Signature Keystore
 
@@ -87,19 +64,15 @@
   - Set `auth.user.encryptedPassword` to the bcrypt hash of the password.
     - There are many tools to generate a bcrypt hash. Here's [one](https://bcrypt.online/) such tool.
 
-### Running
+### Deployment
 
-- Run the .jar from the build step:
-
-  ```console
-  $java [-DconfigFilePath=CONFIGURATION_FILEPATH] -jar eta-einvoice-signer-1.0-SNAPSHOT.jar
-  ```
+- Deploy the directory `eta-einvoice-signer` to a java application server such as tomcat.
 
 ## Usage
 
 ### Available Endpoints
 
-- /sign
+- /eta-einvoice-signer
 
   - Request
 
