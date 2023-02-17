@@ -14,6 +14,7 @@
 	<groupId>com.github.mostafaism1</groupId>
 	<artifactId>eta-einvoice-signer</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
 	<name>eta-einvoice-signer</name>
 	<description
   >A web application for canonicalizing and signing e-invoice documents according to the rules of the Egyptian Tax Authority (ETA).</description>
